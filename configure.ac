@@ -1,4 +1,4 @@
-AC_INIT([trancas C++], [0.1], [miguel@det.uvigo.es],
+AC_INIT(trancas, [0.1], [miguel@det.uvigo.es],
              [trancas_cc])
 AC_LANG([C++])
 AC_PREREQ([2.59])
