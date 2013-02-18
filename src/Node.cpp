@@ -20,4 +20,37 @@
  */
 
 #include "Node.h"
+#include "Ant.h"
 
+using namespace std;
+
+Node::Node(const std::string& name) noexcept :
+id(genId()), name(name), status(new InternalStatus) {
+}
+
+int Node::genId() noexcept {
+    static int id_generator = 0;
+
+    return ++id_generator;
+}
+
+Node::Neighbour::Neighbour() noexcept : currentTraffic(std::make_shared<double> (0)) {
+}
+
+double Node::Neighbour::getProb(const NodePair& routeEnds) const noexcept {
+    auto ci = routeProbs.find(routeEnds);
+    
+    if (ci == routeProbs.end())
+        return 0;
+    
+    return ci->second;
+}
+
+double Node::Neighbour::setProb(const NodePair& routeEnds, double prob) throw (NodeException) {
+    if (prob < 0 || prob > 1)
+        throw NodeException("Probability cannot be outside [0, 1] range.");
+    
+    routeProbs[routeEnds] = prob;
+    
+    return prob;
+}

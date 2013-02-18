@@ -35,36 +35,31 @@ public:
     }
 };
 
-class Route {
+class Route : public std::vector<Node> {
 public:
 
     Route() noexcept : index(0) {
     }
 
-    Route(const std::vector<Node>& nodes) noexcept : index(0), nodes(nodes) {
+    Route(const std::vector<Node>& nodes) noexcept : vector(nodes), index(0) {
     }
 
-    Route(std::vector<Node>&& nodes) noexcept : index(0), nodes(nodes) {
+    Route(std::vector<Node>&& nodes) noexcept : vector(nodes), index(0) {
     }
-
-    void push_back(const Node& node) noexcept {
-        nodes.push_back(node);
-    }
-
-    void push_back(Node&& node) noexcept {
-        nodes.push_back(node);
-    }
+    
+    Node getSrc() const noexcept { return front(); }
+    Node getDst() const noexcept { return back(); }    
 
     Node getCurrent() const noexcept {
-        return nodes[index];
-    }
+        return at(index);
+    }        
 
     bool isFirst() const noexcept {
         return index == 0;
     }
 
     bool isLast() const noexcept {
-        return index == nodes.size();
+        return index == size();
     }
 
     Node goNext() throw (RouteException) {
@@ -83,14 +78,8 @@ public:
         return getCurrent();
     }
     
-    Node getSrc() const noexcept { return nodes.front(); }
-    Node getDst() const noexcept { return nodes.back(); }
-    
-    std::vector<Node>::iterator begin() noexcept { return nodes.begin(); }
-    std::vector<Node>::iterator end() noexcept { return nodes.end(); }
 private:
-    std::vector<Node>::size_type index;
-    std::vector<Node> nodes;
+    size_type index;    
 };
 
 #endif	/* ROUTE_H */

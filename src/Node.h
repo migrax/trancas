@@ -25,15 +25,43 @@
 #define	NODE_H
 
 #include <string>
+#include <map>
+#include <memory>
+#include <utility>
+#include <cassert>
 
-class Node {
+#include <boost/operators.hpp>
+
+#include "TrancasException.h"
+
+class Route;
+
+class NodeException : public TrancasException {
 public:
-    Node(const std::string& name) noexcept : name(name) {}
+    NodeException(const std::string& reason) noexcept : TrancasException(reason) {}
+};
+
+class Node : public boost::less_than_comparable<Node>,
+        public boost::equality_comparable<Node>{
+public:
+    Node(const std::string& name) noexcept;
     
     operator const std::string& () const noexcept {
+        return getName();
+    }
+    const std::string& getName() const noexcept {
         return name;
     }
+    
+    bool operator==(const Node& b) const noexcept {
+        return id == b.id;
+    }
+    
+    bool operator<(const Node& b) const noexcept {
+        return id < b.id;
+    }
 private:
+    int id;
     std::string name;
     
     /*
@@ -42,6 +70,28 @@ private:
      * Links do not belong here. Another DB. 
      * 
      */
+    class Neighbour {
+    public:
+        typedef std::pair<Node, Node> NodePair;
+        
+        Neighbour() noexcept;
+        
+        double addTraffic(double traffic) { return *currentTraffic += traffic; }
+        double rmTraffic(double traffic) { assert((*currentTraffic -= traffic) >= 0); return *currentTraffic;}
+        double getProb(const NodePair& routeEnds) const noexcept;
+        double setProb(const NodePair& routeEnds, double prob) throw(NodeException);
+    private:
+        std::shared_ptr<double> currentTraffic;
+        std::map<NodePair, double> routeProbs;
+    };
+    
+    struct InternalStatus {
+        std::map<std::string, Route> routes;
+        std::map<std::string, Neighbour> neighbours;        
+    };
+    std::shared_ptr<InternalStatus> status;
+    
+    static int genId() noexcept;
 };
 
 #endif	/* NODE_H */
