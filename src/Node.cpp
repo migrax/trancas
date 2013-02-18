@@ -54,3 +54,9 @@ double Node::Neighbour::setProb(const NodePair& routeEnds, double prob) throw (N
     
     return prob;
 }
+
+ostream& operator<<(ostream& output, const Node& l) {    
+    output << l;
+
+    return output;
+}

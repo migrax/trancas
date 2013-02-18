@@ -44,6 +44,8 @@ public:
 class Node : public boost::less_than_comparable<Node>,
         public boost::equality_comparable<Node>{
 public:
+    typedef std::pair<Node, Node> NodePair;
+    
     Node(const std::string& name) noexcept;
     
     operator const std::string& () const noexcept {
@@ -71,9 +73,7 @@ private:
      * 
      */
     class Neighbour {
-    public:
-        typedef std::pair<Node, Node> NodePair;
-        
+    public:                
         Neighbour() noexcept;
         
         double addTraffic(double traffic) { return *currentTraffic += traffic; }
@@ -93,6 +93,8 @@ private:
     
     static int genId() noexcept;
 };
+
+std::ostream& operator<<(std::ostream& output, const Node& l);
 
 #endif	/* NODE_H */
 

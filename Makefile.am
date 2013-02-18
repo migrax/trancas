@@ -7,6 +7,8 @@ trancas_SOURCES = src/main.cpp \
 		  src/Node.cpp \
 		  src/TrancasException.cpp \
 		  src/ForwardAnt.cpp \
-		  src/BackwardAnt.cpp
+		  src/BackwardAnt.cpp \
+		  src/Link.cpp \
+		  src/Network.cpp
 
 dist_noinst_SCRIPTS = autogen.sh
