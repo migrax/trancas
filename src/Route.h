@@ -28,6 +28,7 @@
 #include "TrancasException.h"
 
 #include <vector>
+#include <ostream>
 
 class RouteException : public TrancasException {
 public:
@@ -44,7 +45,7 @@ public:
     Route(const std::vector<Node>& nodes) noexcept : vector(nodes), index(0) {
     }
 
-    Route(std::vector<Node>&& nodes) noexcept : vector(nodes), index(0) {
+    Route(std::vector<Node>&& nodes) noexcept : vector(std::move(nodes)), index(0) {
     }
     
     Node getSrc() const noexcept { return front(); }
@@ -81,6 +82,8 @@ public:
 private:
     size_type index;    
 };
+
+std::ostream& operator<<(std::ostream& os, const Route& r);
 
 #endif	/* ROUTE_H */
 

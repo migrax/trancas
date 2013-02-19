@@ -31,6 +31,8 @@
 #include "Link.h"
 #include "TrancasException.h"
 
+class Route;
+
 class NetworkException : public TrancasException {
 public:
     NetworkException(const std::string& reason) :  TrancasException(reason) {}
@@ -38,45 +40,34 @@ public:
 
 class Network {
 public:
-    Network();
+    Network() {};
 
-    void add(const Node& n) noexcept {
-        nodes.insert(std::make_pair(n.getName(), n));
-    }
-
-    void add(Node&& n) noexcept {
-        nodes.insert(std::move(std::make_pair(n.getName(), n)));
-    }
+    void add(const Node& n) noexcept;
     
-    Node findNode(const std::string& nodeName) const {
-        auto cnode = nodes.find(nodeName);
+    Node getNode(const std::string& nodeName) const throw(NetworkException);
+    
+    void add(const Link& l) noexcept;
+    
+    Link getLink(const Node::NodePair& np) const throw(NetworkException);
+    
+    const std::set<Node>& getNeighbours(const Node& orig) const throw(NetworkException) {
+        auto ci = nodeEdges.find(orig);
         
-        if (cnode == nodes.end())
-            throw NetworkException("Cannot find node " + nodeName + " in network.");
+        if (ci == nodeEdges.end()) {
+            throw NetworkException("Node " + orig.getName() + " has no links");
+        }
         
-        return cnode->second;
-    }
+        return ci->second;
+    }    
     
-    void add(const Link& l) noexcept {
-        links.insert(l);
-    }
-    
-    void add(Link&& l) noexcept {
-        links.insert(l);
-    }
-    
-    Link findLink(const Node::NodePair& np) const {        
-        auto clink = links.find(np);
-        
-        if (clink == links.end())
-            throw NetworkException("Cannot find node between " + std::string(np.first) + " and " + std::string(np.second) + '.');
-                
-        return *clink;
-    }
-
+    Route addTraffic(Node orig, const Node& dst, double traffic) throw(TrancasException);
+    // addtraffic
+    // removetraffic
+    // sendant
 private:
     std::map<std::string, Node> nodes;
     std::set<Link> links;
+    std::map<std::string, std::set<Node> > nodeEdges;
 };
 
 #endif	/* NETWORK_H */

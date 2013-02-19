@@ -25,7 +25,7 @@
 using namespace std;
 
 Node::Node(const std::string& name) noexcept :
-id(genId()), name(name), status(new InternalStatus) {
+id(genId()), name(name), status(make_shared<InternalStatus>()) {
 }
 
 int Node::genId() noexcept {
@@ -34,29 +34,58 @@ int Node::genId() noexcept {
     return ++id_generator;
 }
 
-Node::Neighbour::Neighbour() noexcept : currentTraffic(std::make_shared<double> (0)) {
+void Node::add(const Node& neighbour) noexcept {
+    status->neighbours[neighbour] = Neighbour();
+}
+
+double Node::addTraffic(const Node& neighbour, double traffic) throw (NodeException) {
+    auto i = status->neighbours.find(neighbour);
+    
+    if (i == status->neighbours.end()) {
+        throw NodeException("Node " + string(neighbour) + " is not a neighbour of " + getName());
+    }
+    
+    return i->second.addTraffic(traffic);
+}
+
+void Node::addRoute(const Route& r, double traffic) throw (TrancasException) {
+    const Node& dst = r.back();
+    auto ci = status->routes.find(dst);
+    
+    if (ci != status->routes.end()) {
+        throw NodeException("There is already a route from " + getName() + " to " + dst.getName());
+    }
+    
+    if (*this != r.front()) {
+        throw RouteException("Cannot add route that does not start here: " + getName());
+    }
+    
+    status->routes[dst] = r;
+}
+
+Node::Neighbour::Neighbour() noexcept : status(std::make_shared<_status> ()) {
 }
 
 double Node::Neighbour::getProb(const NodePair& routeEnds) const noexcept {
-    auto ci = routeProbs.find(routeEnds);
-    
-    if (ci == routeProbs.end())
+    auto ci = status->routeProbs.find(routeEnds);
+
+    if (ci == status->routeProbs.end())
         return 0;
-    
+
     return ci->second;
 }
 
 double Node::Neighbour::setProb(const NodePair& routeEnds, double prob) throw (NodeException) {
     if (prob < 0 || prob > 1)
         throw NodeException("Probability cannot be outside [0, 1] range.");
-    
-    routeProbs[routeEnds] = prob;
-    
+
+    status->routeProbs[routeEnds] = prob;
+
     return prob;
 }
 
-ostream& operator<<(ostream& output, const Node& l) {    
-    output << l;
+ostream& operator<<(ostream& output, const Node& n) {
+    output << n.getName();
 
     return output;
 }

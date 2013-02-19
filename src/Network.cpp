@@ -22,5 +22,61 @@
 #include "config.h"
 
 #include "Network.h"
+#include "Route.h"
+#include "Dijkstra.h"
 
+using namespace std;
 
+void Network::add(const Node& n) noexcept {
+    nodes.insert(std::make_pair(n.getName(), n));
+}
+
+Node Network::getNode(const std::string& nodeName) const throw (NetworkException) {
+    auto cnode = nodes.find(nodeName);
+
+    if (cnode == nodes.end())
+        throw NetworkException("Cannot find node " + nodeName + " in network.");
+
+    return cnode->second;
+}
+
+void Network::add(const Link& l) noexcept {
+    links.insert(l);
+    
+    // Make both nodes known to each other
+    l.getOrig().add(l.getDst());
+    l.getDst().add(l.getOrig());
+    
+    nodeEdges[l.getOrig()].insert(l.getDst());
+    nodeEdges[l.getDst()].insert(l.getOrig());
+}
+
+Link Network::getLink(const Node::NodePair& np) const throw (NetworkException) {
+    auto clink = links.find(np);
+
+    if (clink == links.end())
+        throw NetworkException("Cannot find node between " + std::string(np.first) + " and " + std::string(np.second) + '.');
+
+    return *clink;
+}
+
+Route Network::addTraffic(Node orig, const Node& dst, double traffic) throw(TrancasException) {
+    /* Algorithm:
+     * a) Calculate route (link collection)
+     * b) Update info at orig node
+     * c) Update link traffic
+     * d) Update Nodes neighbour traffic
+     */
+    Dijkstra spf(orig, dst, *this, traffic);
+    
+    Route r = spf.getRoute();
+    for (auto i = r.begin(); i < r.end() - 1; i++) {
+        Link l = getLink(make_pair(*i, *(i+1)));
+        l.addTraffic(traffic);
+        
+        i->addTraffic(*(i+1), traffic);
+    }
+    orig.addRoute(r, traffic);
+    
+    return r;
+}

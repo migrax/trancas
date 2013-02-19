@@ -19,42 +19,45 @@
  *
  */
 
-#ifndef ANT_H
-#define	ANT_H
-
 #include "config.h"
-#include "Node.h"
+
+#ifndef SHORTESTPATH_H
+#define	SHORTESTPATH_H
+
 #include "Route.h"
 #include "TrancasException.h"
 
-#include <stack>
-#include <utility>
+class Network;
+class Node;
 
-class AntException : public TrancasException {
+class SPFException : public TrancasException {
 public:
-    AntException(const std::string& reason) noexcept : TrancasException(reason) {}
+    SPFException(const std::string& reason) : TrancasException(reason) {
+    }
 };
 
-class BackwardAnt;
-
-class Ant {
+class ShortestPath {
 public:
+    double getCost() const noexcept;
 
-    Ant(const Route& route, double traffic) noexcept : route(route), traffic(traffic) {
-    }
-    Ant(const Route&& route, double traffic) noexcept : route(std::move(route)), traffic(traffic) {
+    Route getRoute() const noexcept {
+        return nodes;
     }
 
-    virtual Node advance() throw(AntException) = 0;
-    
-    friend class BackwardAnt;
-protected:    
-    Route route;    
-    double traffic;
-    
-    // Internal state
-    std::stack<std::pair<Node, double> > linkCosts;
+protected:
+
+    ShortestPath(const Node& src, const Node& dst,
+            const Network& graph, double lambda) noexcept : src(src), dst(dst),
+    graph(graph), lambda(lambda) {
+    }
+
+    const Node& src;
+    const Node& dst;
+    const Network& graph;
+    const double lambda;
+
+    Route nodes;
 };
 
-#endif	/* ANT_H */
+#endif	/* SHORTESTPATH_H */
 

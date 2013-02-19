@@ -19,42 +19,19 @@
  *
  */
 
-#ifndef ANT_H
-#define	ANT_H
-
-#include "config.h"
+#include "ShortestPath.h"
+#include "Link.h"
+#include "Network.h"
 #include "Node.h"
-#include "Route.h"
-#include "TrancasException.h"
 
-#include <stack>
-#include <utility>
+using namespace std;
 
-class AntException : public TrancasException {
-public:
-    AntException(const std::string& reason) noexcept : TrancasException(reason) {}
-};
-
-class BackwardAnt;
-
-class Ant {
-public:
-
-    Ant(const Route& route, double traffic) noexcept : route(route), traffic(traffic) {
-    }
-    Ant(const Route&& route, double traffic) noexcept : route(std::move(route)), traffic(traffic) {
-    }
-
-    virtual Node advance() throw(AntException) = 0;
+double ShortestPath::getCost() const noexcept {    
+    double cost = 0;
     
-    friend class BackwardAnt;
-protected:    
-    Route route;    
-    double traffic;
+    for (auto ci = nodes.begin(); ci < nodes.end() - 1; ci++) {            
+        cost += graph.getLink(make_pair(*ci, *(ci + 1))).getCost(lambda);
+    };
     
-    // Internal state
-    std::stack<std::pair<Node, double> > linkCosts;
-};
-
-#endif	/* ANT_H */
-
+    return cost;
+}   

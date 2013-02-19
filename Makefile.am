@@ -9,6 +9,9 @@ trancas_SOURCES = src/main.cpp \
 		  src/ForwardAnt.cpp \
 		  src/BackwardAnt.cpp \
 		  src/Link.cpp \
-		  src/Network.cpp
+		  src/Network.cpp \
+		  src/ShortestPath.cpp \
+		  src/Dijkstra.cpp \
+		  src/Route.cpp
 
 dist_noinst_SCRIPTS = autogen.sh

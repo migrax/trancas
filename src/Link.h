@@ -33,17 +33,26 @@
 
 class Link {
 public:
-    Link(const Node::NodePair& np) : Link(np.first, np.second) {}
-    
-    Link(const Node& orig, const Node& dst) : nodes(std::make_pair(orig, dst)),
+
+    Link(const Node::NodePair& np) : nodes(normalizedNodePair(np)),
     shared(nullptr) {
     }
 
+    Link(const Node& orig, const Node& dst) : Link(Node::NodePair(orig, dst)) {
+    }
+
     Link(const Node& orig, const Node& dst,
-            std::vector<double> coeficients,
-            double max_traffic = 0) noexcept : nodes(std::make_pair(orig, dst)),
+            const std::vector<double>& coeficients,
+            double max_traffic = 0) noexcept : nodes(normalizedNodePair(Node::NodePair(orig, dst))),
     max_traffic(max_traffic),
-    shared(std::make_shared<_shared>()) {
+    shared(std::make_shared<_shared>(coeficients)) {
+    }
+
+    Link(const Node& orig, const Node& dst,
+            std::vector<double>&& coeficients,
+            double max_traffic = 0) noexcept : nodes(normalizedNodePair(Node::NodePair(orig, dst))),
+    max_traffic(max_traffic),
+    shared(std::make_shared<_shared>(std::move(coeficients))) {
     }
 
     Node getOrig() const noexcept {
@@ -68,8 +77,8 @@ public:
     void setPower(std::vector<double>&& coeficients) noexcept {
         if (shared == nullptr)
             shared = std::make_shared<_shared>();
-        
-        shared->coefs = coeficients;
+
+        shared->coefs = std::move(coeficients);
     }
 
     double getCost(double lambda) const noexcept;
@@ -97,26 +106,39 @@ public:
 
         return updateCurrentPower();
     }
-    
+
     bool operator<(const Link& b) const noexcept {
         return nodes < b.nodes;
     }
-    
+
 private:
     Node::NodePair nodes;
+
+    Node::NodePair normalizedNodePair(const Node::NodePair& nodes) const noexcept {
+        if (nodes.first < nodes.second)
+            return nodes;
+        else
+            return Node::NodePair(nodes.second, nodes.first);
+    }
 
     double max_traffic;
 
     struct _shared {
 
-        _shared() : coefs(), current_traffic(0), current_power(0) {
+        _shared() : coefs() {
+        }
+
+        _shared(const std::vector<double>& coefs) : coefs(coefs) {
+        }
+
+        _shared(std::vector<double>&& coefs) : coefs(std::move(coefs)) {
         }
 
         std::vector<double> coefs;
 
         // Status
-        double current_traffic;
-        mutable double current_power;
+        double current_traffic = 0;
+        mutable double current_power = 0;
     };
 
     std::shared_ptr<_shared> shared;

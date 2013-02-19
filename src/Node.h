@@ -38,34 +38,43 @@ class Route;
 
 class NodeException : public TrancasException {
 public:
-    NodeException(const std::string& reason) noexcept : TrancasException(reason) {}
+
+    NodeException(const std::string& reason) noexcept : TrancasException(reason) {
+    }
 };
 
 class Node : public boost::less_than_comparable<Node>,
-        public boost::equality_comparable<Node>{
+public boost::equality_comparable<Node> {
 public:
     typedef std::pair<Node, Node> NodePair;
-    
+
     Node(const std::string& name) noexcept;
-    
+
     operator const std::string& () const noexcept {
         return getName();
     }
+
     const std::string& getName() const noexcept {
         return name;
     }
+
+    void add(const Node& neighbour) noexcept;
     
+    double addTraffic(const Node& neighbour, double traffic) throw(NodeException);
+    
+    void addRoute(const Route& r, double traffic) throw(TrancasException);
+
     bool operator==(const Node& b) const noexcept {
         return id == b.id;
     }
-    
+
     bool operator<(const Node& b) const noexcept {
         return id < b.id;
     }
 private:
     int id;
     std::string name;
-    
+
     /*
      * Routes to every destination
      * Traffic for every neightbour. How? (Idea al nodo fuente "refresca" las rutas cuando llegan las hormigas de vuelta... en la práctica se haría con estimaciones de tráfico)
@@ -73,24 +82,38 @@ private:
      * 
      */
     class Neighbour {
-    public:                
+    public:
         Neighbour() noexcept;
-        
-        double addTraffic(double traffic) { return *currentTraffic += traffic; }
-        double rmTraffic(double traffic) { assert((*currentTraffic -= traffic) >= 0); return *currentTraffic;}
+
+        double addTraffic(double traffic) {
+            return status->currentTraffic += traffic;
+        }
+
+        double rmTraffic(double traffic) {
+            assert((status->currentTraffic -= traffic) >= 0);
+            return status->currentTraffic;
+        }
         double getProb(const NodePair& routeEnds) const noexcept;
-        double setProb(const NodePair& routeEnds, double prob) throw(NodeException);
+        double setProb(const NodePair& routeEnds, double prob) throw (NodeException);
     private:
-        std::shared_ptr<double> currentTraffic;
-        std::map<NodePair, double> routeProbs;
+
+        struct _status {
+            _status() : currentTraffic(0) {
+            }
+
+            double currentTraffic;
+            std::map<NodePair, double> routeProbs;
+        };
+
+        std::shared_ptr<_status> status;
     };
-    
+
     struct InternalStatus {
         std::map<std::string, Route> routes;
-        std::map<std::string, Neighbour> neighbours;        
+        std::map<std::string, Neighbour> neighbours;
     };
     std::shared_ptr<InternalStatus> status;
-    
+
     static int genId() noexcept;
 };
 

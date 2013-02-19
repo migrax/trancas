@@ -19,42 +19,37 @@
  *
  */
 
-#ifndef ANT_H
-#define	ANT_H
-
 #include "config.h"
-#include "Node.h"
-#include "Route.h"
-#include "TrancasException.h"
 
-#include <stack>
+#ifndef DIJKSTRA_H
+#define	DIJKSTRA_H
+
+#include "ShortestPath.h"
+#include "Distance.h"
+
+#include <map>
 #include <utility>
+#include <set>
 
-class AntException : public TrancasException {
+#include "Node.h"
+
+class Network;
+
+/* This is NOT the complete Dijkstra algorithm. It stops once the route
+ * to dst has been found. */
+
+class Dijkstra : public ShortestPath {
 public:
-    AntException(const std::string& reason) noexcept : TrancasException(reason) {}
+    Dijkstra(const Node& src, const Node& dst,
+            const Network& graph, double lambda) throw(TrancasException);
+
+
+private:    
+    typedef std::map<std::string, std::pair<Distance<double>, Node::NodePair> > distances_map;
+    
+    void updateDistances(distances_map *distances, Node newest) const;
+    Node getNearestNode(const distances_map& distances, const std::set<Node>& reachable) const noexcept;
 };
 
-class BackwardAnt;
-
-class Ant {
-public:
-
-    Ant(const Route& route, double traffic) noexcept : route(route), traffic(traffic) {
-    }
-    Ant(const Route&& route, double traffic) noexcept : route(std::move(route)), traffic(traffic) {
-    }
-
-    virtual Node advance() throw(AntException) = 0;
-    
-    friend class BackwardAnt;
-protected:    
-    Route route;    
-    double traffic;
-    
-    // Internal state
-    std::stack<std::pair<Node, double> > linkCosts;
-};
-
-#endif	/* ANT_H */
+#endif	/* DIJKSTRA_H */
 

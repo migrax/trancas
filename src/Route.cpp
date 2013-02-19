@@ -20,9 +20,15 @@
  */
 #include "Route.h"
 
-Route::Route() {
-}
+using namespace std;
 
-Route::Route(const Route& orig) {
+ostream& operator<<(ostream& os, const Route& r) {            
+    for (auto ci = r.begin(); ci < r.end(); ci++) { 
+        os << *ci;        
+        if (ci + 1 < r.end())
+            os << " → ";
+    }
+    
+    return os;
 }
 

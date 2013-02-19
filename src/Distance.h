@@ -19,42 +19,42 @@
  *
  */
 
-#ifndef ANT_H
-#define	ANT_H
-
 #include "config.h"
-#include "Node.h"
-#include "Route.h"
-#include "TrancasException.h"
 
-#include <stack>
-#include <utility>
+#ifndef DISTANCE_H
+#define	DISTANCE_H
 
-class AntException : public TrancasException {
-public:
-    AntException(const std::string& reason) noexcept : TrancasException(reason) {}
-};
+#include <boost/operators.hpp>
 
-class BackwardAnt;
-
-class Ant {
+template<typename D>
+class Distance : public boost::less_than_comparable<Distance<D> >,
+boost::addable<Distance<D> > {
 public:
 
-    Ant(const Route& route, double traffic) noexcept : route(route), traffic(traffic) {
-    }
-    Ant(const Route&& route, double traffic) noexcept : route(std::move(route)), traffic(traffic) {
+    Distance(D dst) noexcept : dst(dst), tiebreak(1) {
     }
 
-    virtual Node advance() throw(AntException) = 0;
+    Distance(D dst, int tiebreak) noexcept : dst(dst), tiebreak(tiebreak) {
+    }
+
+    bool operator<(const Distance& b) const noexcept {
+        if (dst == b.dst)
+            return tiebreak < b.tiebreak;
+        
+        return dst < b.dst;
+    }
     
-    friend class BackwardAnt;
-protected:    
-    Route route;    
-    double traffic;
+    const Distance& operator+=(const Distance& b) noexcept {
+        dst += b.dst;
+        tiebreak += b.tiebreak;
+        
+        return *this;        
+    }
     
-    // Internal state
-    std::stack<std::pair<Node, double> > linkCosts;
+private:
+    D dst;
+    int tiebreak;
 };
 
-#endif	/* ANT_H */
+#endif	/* DISTANCE_H */
 
