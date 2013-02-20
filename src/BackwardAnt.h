@@ -25,6 +25,7 @@
 #define	BACKWARDANT_H
 
 #include "ForwardAnt.h"
+#include "Network.h"
 
 #include <utility>
 
@@ -39,7 +40,7 @@ public:
     }
 
     Node advance() throw(AntException);
-    Node::RouteInfo getRoute() throw(AntException);    
+    Network::RouteInfo getRoute() throw(AntException);    
 private:
     Route newRoute;
     bool reversed = false;

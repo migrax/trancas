@@ -46,8 +46,7 @@ public:
 class Node : public boost::less_than_comparable<Node>,
 public boost::equality_comparable<Node> {
 public:
-    typedef std::pair<Node, Node> NodePair;
-    typedef std::pair<Route, double> RouteInfo;
+    typedef std::pair<Node, Node> NodePair;    
 
     Node(const std::string& name) noexcept;
 
@@ -61,11 +60,7 @@ public:
 
     void add(const Node& neighbour) noexcept;
 
-    double addTraffic(const Node& neighbour, double traffic) throw (NodeException);
-
-    void addRoute(const Route& r, double traffic) throw (TrancasException);
-    
-    const RouteInfo& getRouteInfo(const Node& dst) const throw (NodeException);
+    double addTraffic(const Node& neighbour, double traffic) throw (NodeException);    
 
     bool operator==(const Node& b) const noexcept {
         return id == b.id;
@@ -111,8 +106,7 @@ private:
         std::shared_ptr<_status> status;
     };
 
-    struct InternalStatus {                
-        std::map<std::string, RouteInfo> routes;
+    struct InternalStatus {                        
         std::map<std::string, Neighbour> neighbours;
     };
     std::shared_ptr<InternalStatus> status;

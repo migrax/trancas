@@ -40,6 +40,8 @@ public:
 
 class Network {
 public:
+    typedef std::pair<Route, double> RouteInfo;
+    
     Network() {};
 
     void add(const Node& n) noexcept;
@@ -60,8 +62,10 @@ public:
         return ci->second;
     }    
     
-    Route addTraffic(Node orig, const Node& dst, double traffic) const throw(TrancasException);
-    Route sendAnt(Node orig, const Node& dst) const throw(TrancasException);
+    void addRoute(const Route& r, double traffic) throw (TrancasException);
+    
+    Route addTraffic(Node orig, const Node& dst, double traffic) throw(TrancasException);
+    Route sendAnt(Node orig, const Node& dst) const throw(TrancasException);    
     // addtraffic
     // removetraffic
     // sendant
@@ -69,6 +73,7 @@ private:
     std::map<std::string, Node> nodes;
     std::set<Link> links;
     std::map<std::string, std::set<Node> > nodeEdges;
+    std::map<std::pair<std::string, std::string>, RouteInfo> routes;
 };
 
 #endif	/* NETWORK_H */
