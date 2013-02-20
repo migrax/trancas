@@ -21,7 +21,44 @@
 
 #include "config.h"
 
+#include "Network.h"
+#include "Route.h"
+
+#include <cmath>
+
+#include <iostream>
+#include <exception>
+
+using namespace std;
+
 int main(int argc, char **argv) {
+    constexpr double log_e_10 = log(10);
+    
+    try {
+        Network net;
+        Node a("A"), b("B"), c("C"), d("D"), e("E"), f("F");
+        net.add(a);
+        net.add(b);
+        net.add(c);
+        net.add(d);
+        net.add(e);
+        net.add(f);
+
+        net.add(Link(a, b,{11. / log_e_10})); // 11/log_e(10)
+        net.add(Link(a, c,{0, 0, 1}));
+        net.add(Link(b, d,{0, 0, 1}));
+        net.add(Link(c, d,{0, 0, 1}));
+        net.add(Link(d, e,{0, 0, 1}));
+        net.add(Link(d, f,{0, 0, 1}));
+
+        cout << net.addTraffic(a, e, 10) << endl       
+             << net.addTraffic(a, f, 10) << endl;
+
+        cout << net.sendAnt(a, e) << endl;
+    } catch (const exception& e) {
+        cerr << "Error: " << e.what() << endl;
+    }
+
     return 0;
 }
 
