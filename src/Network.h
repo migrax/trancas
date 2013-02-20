@@ -60,7 +60,8 @@ public:
         return ci->second;
     }    
     
-    Route addTraffic(Node orig, const Node& dst, double traffic) throw(TrancasException);
+    Route addTraffic(Node orig, const Node& dst, double traffic) const throw(TrancasException);
+    Route sendAnt(Node orig, const Node& dst) const throw(TrancasException);
     // addtraffic
     // removetraffic
     // sendant

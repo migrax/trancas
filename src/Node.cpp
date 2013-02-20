@@ -57,10 +57,20 @@ void Node::addRoute(const Route& r, double traffic) throw (TrancasException) {
     }
     
     if (*this != r.front()) {
-        throw RouteException("Cannot add route that does not start here: " + getName());
+        throw NodeException("Cannot add route that does not start here: " + getName());
     }
     
-    status->routes[dst] = r;
+    status->routes[dst] = make_pair(r, traffic);
+}
+
+const Node::RouteInfo& Node::getRouteInfo(const Node& dst) const throw (NodeException) {
+    auto ci = status->routes.find(dst);
+    
+    if (ci == status->routes.end()) {
+        throw RouteException("There is no such route form " + getName() + " to " + dst.getName() + '.');
+    }
+    
+    return ci->second;
 }
 
 Node::Neighbour::Neighbour() noexcept : status(std::make_shared<_status> ()) {

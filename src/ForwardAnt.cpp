@@ -21,4 +21,13 @@
 
 #include "ForwardAnt.h"
 
+using namespace std;
 
+Node ForwardAnt::advance() throw(AntException) {
+    // FIXME: Dummy implementation
+    
+    visitedNodes.insert(route.getCurrent());
+    linkCosts.push(make_pair(route.getCurrent(), 0));
+    
+    return route.goNext();
+}

@@ -24,6 +24,8 @@
 #include "Network.h"
 #include "Route.h"
 #include "Dijkstra.h"
+#include "ForwardAnt.h"
+#include "BackwardAnt.h"
 
 using namespace std;
 
@@ -60,7 +62,7 @@ Link Network::getLink(const Node::NodePair& np) const throw (NetworkException) {
     return *clink;
 }
 
-Route Network::addTraffic(Node orig, const Node& dst, double traffic) throw(TrancasException) {
+Route Network::addTraffic(Node orig, const Node& dst, double traffic) const throw(TrancasException) {
     /* Algorithm:
      * a) Calculate route (link collection)
      * b) Update info at orig node
@@ -79,4 +81,14 @@ Route Network::addTraffic(Node orig, const Node& dst, double traffic) throw(Tran
     orig.addRoute(r, traffic);
     
     return r;
+}
+
+Route Network::sendAnt(Node orig, const Node& dst) const throw(TrancasException) {
+    ForwardAnt trancas(orig.getRouteInfo(dst).first, orig.getRouteInfo(dst).second);
+    
+    while(dst != trancas.advance());
+    BackwardAnt barrancas(move(trancas));
+    while(orig != barrancas.advance());
+    
+    return barrancas.getRoute().first;
 }

@@ -22,22 +22,36 @@
 #include "BackwardAnt.h"
 
 #include <algorithm>
+#include <cassert>
 
 using namespace std;
 
 void BackwardAnt::prepareRoute() throw (AntException) {
-    if (route.isFirst() == false) {
+    if (!linkCosts.empty()) {
         throw AntException("Cannot give complete route until I reach " + string(route.getSrc()));
-    }
-
+    }    
+    
     if (!reversed) {
         reverse(newRoute.begin(), newRoute.end());
         reversed = true;
     }
+    
+    assert(route.getSrc() == newRoute.front());
 }
 
-const Route& BackwardAnt::getRoute() throw (AntException) {
+Node::RouteInfo BackwardAnt::getRoute() throw (AntException) {
     prepareRoute();
     
-    return route;
+    return make_pair(route, routeCost);
+}
+
+Node BackwardAnt::advance() throw(AntException) {
+    // FIXME: Dummy implementation
+    pair<Node, double> lc = linkCosts.top();
+    routeCost += lc.second;
+    newRoute.push_back(lc.first);
+    
+    linkCosts.pop();
+    
+    return lc.first;
 }

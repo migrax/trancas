@@ -60,7 +60,7 @@ public:
     }
 
     bool isLast() const noexcept {
-        return index == size();
+        return index == size() - 1;
     }
 
     Node goNext() throw (RouteException) {

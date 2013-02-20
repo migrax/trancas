@@ -30,7 +30,7 @@
 
 class BackwardAnt : public Ant {
 public:
-    BackwardAnt(ForwardAnt&& ant) throw(AntException): Ant(std::move(ant.route), ant.traffic), reversed(false) {
+    BackwardAnt(ForwardAnt&& ant) throw(AntException): Ant(std::move(ant.route), ant.traffic) {
         if (route.isLast() == false) {
             throw AntException("Backward ants must start at the end of the route");
         }
@@ -39,10 +39,11 @@ public:
     }
 
     Node advance() throw(AntException);
-    const Route& getRoute() throw(AntException);    
+    Node::RouteInfo getRoute() throw(AntException);    
 private:
     Route newRoute;
-    bool reversed;
+    bool reversed = false;
+    double routeCost = 0;
     
     void prepareRoute() throw(AntException);
 };
