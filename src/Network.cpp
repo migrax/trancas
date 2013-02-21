@@ -49,22 +49,28 @@ void Network::add(const Link& l) noexcept {
     // Make both nodes known to each other
     l.getOrig().add(l.getDst());
     l.getDst().add(l.getOrig());
-    
+
     nodeEdges[l.getOrig()].insert(l.getDst());
     nodeEdges[l.getDst()].insert(l.getOrig());
 }
 
-void Network::addRoute(const Route& r, double traffic) throw (TrancasException) {
+void Network::addNewRoute(const Route& r, double traffic) throw (TrancasException) {
     const Node& orig = r.front();
     const Node& dst = r.back();
     pair<string, string> np = make_pair(orig, dst);
     auto ci = routes.find(np);
-    
+
     if (ci != routes.end()) {
         throw RouteException("There is already a route from " + orig.getName() + " to " + dst.getName());
-    }    
-    
+    }
+
     routes[np] = make_pair(r, traffic);
+
+    // Tell nodes to adjust neighbour probabilities
+    for (Node n : r) {
+        if (n != r.getDst())
+            n.cleanRoute(make_pair(getNode(orig), getNode(dst)));
+    }
 }
 
 Link Network::getLink(const Node::NodePair& np) const throw (NetworkException) {
@@ -76,7 +82,7 @@ Link Network::getLink(const Node::NodePair& np) const throw (NetworkException) {
     return *clink;
 }
 
-Route Network::addTraffic(Node orig, const Node& dst, double traffic) throw(TrancasException) {
+Route Network::addTraffic(Node orig, const Node& dst, double traffic) throw (TrancasException) {
     /* Algorithm:
      * a) Calculate route (link collection)
      * b) Update info at orig node
@@ -84,29 +90,30 @@ Route Network::addTraffic(Node orig, const Node& dst, double traffic) throw(Tran
      * d) Update Nodes neighbour traffic
      */
     Dijkstra spf(orig, dst, *this, traffic);
-    
+
     Route r = spf.getRoute();
     for (auto i = r.begin(); i < r.end() - 1; i++) {
-        Link l = getLink(make_pair(*i, *(i+1)));
+        Link l = getLink(make_pair(*i, *(i + 1)));
         l.addTraffic(traffic);
-        
-        i->addTraffic(*(i+1), traffic);
+
+        i->addTraffic(*(i + 1), traffic);
     }
-    addRoute(r, traffic);
-    
+    addNewRoute(r, traffic);
+
     return r;
 }
 
-Route Network::sendAnt(Node orig, const Node& dst) const throw(TrancasException) {
+Route Network::sendAnt(Node orig, const Node& dst) const throw (TrancasException) {
     auto ci = routes.find(make_pair(orig, dst));
     if (ci == routes.end())
         throw RouteException("No such route from " + string(orig) + " to " + string(dst) + '.');
-    
-    ForwardAnt trancas(ci->second.first, ci->second.second);
-    
-    while(dst != trancas.advance());
+
+    ForwardAnt trancas(*this, ci->second.first, ci->second.second);
+
+    while (dst != trancas.advance());
+    trancas.dump();
     BackwardAnt barrancas(move(trancas));
-    while(orig != barrancas.advance());
-    
+    while (orig != barrancas.advance());
+
     return barrancas.getRoute().first;
 }

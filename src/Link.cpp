@@ -44,7 +44,7 @@ namespace {
 
         void operator() (R coef) noexcept {
             current = max(static_cast<R> (0), current); // Cost is always possitive
-            
+
             cost += coef * current;
 
             if (!first) {
@@ -64,7 +64,7 @@ namespace {
     template<typename D, class C>
     static D getCostForTraffic(D lambda, const C& coefs) noexcept {
         typedef typename C::value_type vtype;
-        
+
         Power<vtype, vtype> p = for_each(coefs.begin(), coefs.end(), Power<vtype, vtype>(lambda));
 
         return p.getCost();
@@ -79,7 +79,7 @@ double Link::getCost(double lambda) const noexcept {
     double new_cost, current_cost;
 
     new_cost = getCostForTraffic(lambda + shared->current_traffic, shared->coefs);
-    current_cost = getCurrentPower();
+    current_cost = getCurrentCost();
 
     return new_cost - current_cost;
 }
@@ -113,8 +113,13 @@ double Link::getCurrentCost(double flow_traffic) const noexcept {
     if (isCurrentPowerValid()) {
         return shared->current_power;
     }
-
-    return updateCurrentPower();
+    
+    double currentPower = updateCurrentPower();
+    
+    if (flow_traffic > 0.0)
+        return getCost(flow_traffic);
+    else
+        return currentPower;    
 }
 
 ostream& operator<<(ostream& output, const Link& l) {

@@ -28,10 +28,12 @@
 #include "TrancasException.h"
 
 #include <vector>
+#include <set>
 #include <ostream>
 
 class RouteException : public TrancasException {
 public:
+
     RouteException(const std::string& reason) : TrancasException(reason) {
     }
 };
@@ -39,21 +41,26 @@ public:
 class Route : public std::vector<Node> {
 public:
 
-    Route() noexcept : index(0) {
+    Route() noexcept {
     }
 
-    Route(const std::vector<Node>& nodes) noexcept : vector(nodes), index(0) {
+    Route(const std::vector<Node>& nodes) noexcept : vector(nodes) {
     }
 
-    Route(std::vector<Node>&& nodes) noexcept : vector(std::move(nodes)), index(0) {
+    Route(std::vector<Node>&& nodes) noexcept : vector(std::move(nodes)) {
     }
-    
-    Node getSrc() const noexcept { return front(); }
-    Node getDst() const noexcept { return back(); }    
 
-    Node getCurrent() const noexcept {
-        return at(index);
-    }        
+    const Node& getSrc() const noexcept {
+        return front();
+    }
+
+    const Node& getDst() const noexcept {
+        return back();
+    }
+
+    const Node& getCurrent() const noexcept {
+        return (*this)[index];
+    }
 
     bool isFirst() const noexcept {
         return index == 0;
@@ -63,24 +70,55 @@ public:
         return index == size() - 1;
     }
 
-    Node goNext() throw (RouteException) {
+    bool isEdge(const Node::NodePair& edge) const noexcept {
+        if (!edgesReady)
+            populateEdges();
+
+        return edges.find(edge) != edges.end();
+    }
+
+    const Node& getNext() const throw (RouteException) {
         if (isLast())
             throw RouteException("Cannot go past node " + std::string(getCurrent()));
 
-        index += 1;
-        return getCurrent();
+        return (*this)[index + 1];
     }
 
-    Node goPrevious() throw (RouteException) {
+    const Node& goNext() throw (RouteException) {
+        const Node& next = getNext();
+
+        index += 1;
+
+        return next;
+    }
+
+    const Node& getPrevious() const throw (RouteException) {
         if (isFirst())
             throw RouteException("Cannot go before node" + std::string(getCurrent()));
 
+        return (*this)[index - 1];
+    }
+
+    const Node& goPrevious() throw (RouteException) {
+        const Node& prev = getPrevious();
+
         index -= 1;
+
+        return prev;
+    }
+
+    const Node& rewind() {
+        index = 0;
+
         return getCurrent();
     }
-    
+
 private:
-    size_type index;    
+    size_type index = 0;
+    mutable std::set<Node::NodePair> edges;
+    mutable bool edgesReady = false;
+    
+    void populateEdges() const noexcept;
 };
 
 std::ostream& operator<<(std::ostream& os, const Route& r);

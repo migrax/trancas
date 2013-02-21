@@ -18,29 +18,13 @@
  * Authors: Miguel Rodríguez Pérez <miguel@det.uvigo.es>
  *
  */
-#include "Route.h"
+
+#include "Simulation.h"
 
 using namespace std;
 
-void Route::populateEdges() const noexcept {
-    if (edgesReady)
-        return;
+mt19937_64 Simulation::randomGenerator;
 
-    for (auto ci = begin(); ci < end(); ci++) {
-        if (ci + 1 < end())
-            edges.insert(Node::NodePair(*ci, *(ci + 1)));
-    }
-
-    edgesReady = true;
+void Simulation::setRandomSeed(mt19937_64::result_type seed) noexcept {
+    randomGenerator.seed(seed);
 }
-
-ostream& operator<<(ostream& os, const Route& r) {
-    for (auto ci = r.begin(); ci < r.end(); ci++) {
-        os << *ci;
-        if (ci + 1 < r.end())
-            os << " → ";
-    }
-
-    return os;
-}
-

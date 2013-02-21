@@ -84,7 +84,7 @@ public:
     }
 
     double getCost(double lambda) const noexcept;
-
+    
     double addTraffic(double lambda) {
         invalidateCurrentPower();
 
@@ -101,13 +101,7 @@ public:
         return shared->current_traffic;
     }
 
-    double getCurrentPower() const noexcept {
-        if (isCurrentPowerValid()) {
-            return shared->current_power;
-        }
-
-        return updateCurrentPower();
-    }
+    double getCurrentCost(double flow_traffic = 0.0) const noexcept;
 
     bool operator<(const Link& b) const noexcept {
         return nodes < b.nodes;

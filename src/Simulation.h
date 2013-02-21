@@ -18,29 +18,35 @@
  * Authors: Miguel Rodríguez Pérez <miguel@det.uvigo.es>
  *
  */
-#include "Route.h"
 
-using namespace std;
+#include "config.h"
 
-void Route::populateEdges() const noexcept {
-    if (edgesReady)
-        return;
+#include <random>
+#include <limits>
 
-    for (auto ci = begin(); ci < end(); ci++) {
-        if (ci + 1 < end())
-            edges.insert(Node::NodePair(*ci, *(ci + 1)));
+#ifndef SIMULATION_H
+#define	SIMULATION_H
+
+class Simulation {
+public:    
+    static void setRandomSeed(std::mt19937_64::result_type seed) noexcept;
+    static double getRandom(double a = 0.0, double b = 1.0) noexcept {
+        std::uniform_real_distribution<double> dstr(a, b);
+        
+        return dstr(randomGenerator);
     }
-
-    edgesReady = true;
-}
-
-ostream& operator<<(ostream& os, const Route& r) {
-    for (auto ci = r.begin(); ci < r.end(); ci++) {
-        os << *ci;
-        if (ci + 1 < r.end())
-            os << " → ";
+    template<class IntType = int>
+    static IntType getRandom(IntType a = 0, IntType b = std::numeric_limits<IntType>::max()) noexcept {
+        std::uniform_int_distribution<IntType> dstr(a, b);
+        
+        return dstr(randomGenerator);
     }
+    
+    static constexpr double explorationProb = 0.002;
+    static constexpr double goodnessProb = 1 - explorationProb;
+private:
+    static std::mt19937_64 randomGenerator;
+};
 
-    return os;
-}
+#endif	/* SIMULATION_H */
 

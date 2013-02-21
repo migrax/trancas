@@ -29,15 +29,32 @@
 
 #include <set>
 
+class Network;
+
 class ForwardAnt : public Ant {
 public:
-    ForwardAnt(const Route& route, double traffic) noexcept : 
-        Ant(route, traffic) {};     
-    
-    virtual Node advance() throw(AntException);
-private:    
+
+    ForwardAnt(const Network& graph, const Route& route, double traffic) noexcept :
+    Ant(route, traffic),
+    graph(graph),
+    currentNode(route.front()) {
+        linkCosts.push(std::make_pair(currentNode, 0));
+    };
+
+    virtual Node advance() throw (AntException);
+    void dump() noexcept;
+private:
     // Internal state
-    std::set<Node> visitedNodes;    
+    const Network& graph;
+    std::set<Node> visitedNodes;
+    Node currentNode;
+
+    const Node& chooseNextNode() const noexcept;
+    const Node& chooseRandomNeighbour() const noexcept;
+    const Node& chooseGoodNeighbour() const noexcept;
+    void pruneStack(const Node& rNode) noexcept;
+    // Forward ants move from left to right
+    double getCost(const Node& left, const Node& right) const noexcept;       
 };
 
 #endif	/* FORWARDANT_H */

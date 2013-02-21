@@ -26,6 +26,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <memory>
 #include <utility>
 #include <cassert>
@@ -38,7 +39,6 @@ class Route;
 
 class NodeException : public TrancasException {
 public:
-
     NodeException(const std::string& reason) noexcept : TrancasException(reason) {
     }
 };
@@ -48,7 +48,7 @@ public boost::equality_comparable<Node> {
 public:
     typedef std::pair<Node, Node> NodePair;    
 
-    Node(const std::string& name) noexcept;
+    explicit Node(const std::string& name) noexcept;
 
     operator const std::string& () const noexcept {
         return getName();
@@ -62,6 +62,11 @@ public:
 
     double addTraffic(const Node& neighbour, double traffic) throw (NodeException);    
 
+    void cleanRoute(const NodePair& np) noexcept;
+    
+    const Node& getRandomNeighbour(const std::string& avoid = "") const noexcept;
+    const Node& getGoodNeighbour(const NodePair& routeEnds, const std::string& avoid = "") const noexcept;
+    
     bool operator==(const Node& b) const noexcept {
         return id == b.id;
     }
@@ -81,7 +86,7 @@ private:
      */
     class Neighbour {
     public:
-        Neighbour() noexcept;
+        Neighbour(const Node& node) noexcept;        
 
         double addTraffic(double traffic) {
             return status->currentTraffic += traffic;
@@ -93,8 +98,11 @@ private:
         }
         double getProb(const NodePair& routeEnds) const noexcept;
         double setProb(const NodePair& routeEnds, double prob) throw (NodeException);
+        
+        const std::string& getName() const noexcept { return node->getName(); }        
+        const Node& getNode() const noexcept { return *node; }
     private:
-
+        std::shared_ptr<Node> node;
         struct _status {
             _status() : currentTraffic(0) {
             }
@@ -103,14 +111,17 @@ private:
             std::map<NodePair, double> routeProbs;
         };
 
-        std::shared_ptr<_status> status;
+        std::shared_ptr<_status> status;        
     };
 
     struct InternalStatus {                        
-        std::map<std::string, Neighbour> neighbours;
+        std::map<std::string, std::vector<Neighbour>::size_type> neighboursIndex;
+        std::vector<Neighbour> neighbours;
     };
     std::shared_ptr<InternalStatus> status;
 
+    double getProb(const NodePair& routeEnds, std::vector<Neighbour>::size_type index) const noexcept;
+    
     static int genId() noexcept;
 };
 

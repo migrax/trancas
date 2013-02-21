@@ -21,6 +21,9 @@
 
 #include "Node.h"
 #include "Ant.h"
+#include "Simulation.h"
+
+#include <iostream>
 
 using namespace std;
 
@@ -35,33 +38,88 @@ int Node::genId() noexcept {
 }
 
 void Node::add(const Node& neighbour) noexcept {
-    status->neighbours[neighbour] = Neighbour();
+    auto cindex = status->neighboursIndex.find(neighbour);
+    
+    if (cindex == status->neighboursIndex.end()) {
+        status->neighbours.push_back(Neighbour(neighbour));
+        status->neighboursIndex[neighbour] = status->neighbours.size() - 1;
+    } else {
+        // Replace it!
+        status->neighbours[cindex->second] = Neighbour(neighbour);
+    }    
 }
 
 double Node::addTraffic(const Node& neighbour, double traffic) throw (NodeException) {
-    auto i = status->neighbours.find(neighbour);
+    auto i = status->neighboursIndex.find(neighbour);
     
-    if (i == status->neighbours.end()) {
+    if (i == status->neighboursIndex.end()) {
         throw NodeException("Node " + string(neighbour) + " is not a neighbour of " + getName());
     }
     
-    return i->second.addTraffic(traffic);
+    return status->neighbours[i->second].addTraffic(traffic);
 }
 
-Node::Neighbour::Neighbour() noexcept : status(std::make_shared<_status> ()) {
+void Node::cleanRoute(const NodePair& np) noexcept {
+    // (FIXME: uniform or 1 for chosen?. 1 for chosen looks bad for convergency speed)
+    double prob = 1.0/(status->neighbours.size());
+    
+    for (Neighbour& neigh : status->neighbours) {
+        neigh.setProb(np, prob);
+    }
+}
+
+const Node& Node::getRandomNeighbour(const std::string& avoid) const noexcept {        
+    vector<Neighbour>::size_type index;
+    
+    do {
+        index = Simulation::getRandom<vector<Neighbour>::size_type>(0, status->neighbours.size() - 1);        
+    } while(avoid == status->neighbours[index].getName());
+    
+    return status->neighbours[index].getNode();
+}
+
+const Node& Node::getGoodNeighbour(const NodePair& routeEnds, const std::string& avoid) const noexcept {
+    vector<Neighbour>::size_type index;
+    
+    do {
+        // FIXME: brute force search
+        double acumul = 0.0;    
+        double prob = Simulation::getRandom();        
+        
+        for (index = 0; index < status->neighbours.size(); index++) {        
+            acumul += getProb(routeEnds, index);
+            if (prob <= acumul)
+                break;
+        }        
+        assert(index < status->neighbours.size());
+    } while(avoid == status->neighbours[index].getName());       
+    
+    return status->neighbours[index].getNode();
+}
+
+double Node::getProb(const NodePair& routeEnds, vector<Neighbour>::size_type index) const noexcept {
+    double prob = status->neighbours[index].getProb(routeEnds);
+    
+    if (prob < 0)
+        const_cast<Node *>(this)->cleanRoute(routeEnds); // Just uninitialize stuff
+    
+    return status->neighbours[index].getProb(routeEnds);
+}
+
+Node::Neighbour::Neighbour(const Node& node) noexcept : node(make_shared<Node>(node)), status(std::make_shared<_status> ()) {
 }
 
 double Node::Neighbour::getProb(const NodePair& routeEnds) const noexcept {
     auto ci = status->routeProbs.find(routeEnds);
 
     if (ci == status->routeProbs.end())
-        return 0;
+        return -1; // Signal that we don't know about that route
 
     return ci->second;
 }
 
 double Node::Neighbour::setProb(const NodePair& routeEnds, double prob) throw (NodeException) {
-    if (prob < 0 || prob > 1)
+    if (prob < 0.0 || prob > 1.0)
         throw NodeException("Probability cannot be outside [0, 1] range.");
 
     status->routeProbs[routeEnds] = prob;

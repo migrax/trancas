@@ -21,6 +21,7 @@
 
 #include "config.h"
 
+#include "Simulation.h"
 #include "Network.h"
 #include "Route.h"
 
@@ -33,6 +34,8 @@ using namespace std;
 
 int main(int argc, char **argv) {
     constexpr double log_e_10 = log(10);
+    
+    Simulation::setRandomSeed(1); // Always the same value for debugging
     
     try {
         Network net;
@@ -54,7 +57,7 @@ int main(int argc, char **argv) {
         cout << net.addTraffic(a, e, 10) << endl       
              << net.addTraffic(a, f, 10) << endl;
 
-        cout << net.sendAnt(a, e) << endl;
+        cout << net.sendAnt(a, f) << endl;
     } catch (const exception& e) {
         cerr << "Error: " << e.what() << endl;
     }
