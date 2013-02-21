@@ -34,27 +34,29 @@
 class Link {
 public:
 
-    Link(const Node::NodePair& np) : nodes(normalizedNodePair(np)),
+    Link(const Node::NodePair& np) noexcept : nodes(np),
     shared(nullptr) {
     }
 
-    Link(const Node& orig, const Node& dst) : Link(Node::NodePair(orig, dst)) {
+    Link(const Node& orig, const Node& dst) noexcept : Link(Node::NodePair(orig, dst)) {
     }
 
     Link(const Node& orig, const Node& dst,
             const std::vector<double>& coeficients,
-            double max_traffic = 0) noexcept : nodes(normalizedNodePair(Node::NodePair(orig, dst))),
+            double max_traffic = 0) noexcept : nodes(Node::NodePair(orig, dst)),
     max_traffic(max_traffic),
     shared(std::make_shared<_shared>(coeficients)) {
     }
 
     Link(const Node& orig, const Node& dst,
             std::vector<double>&& coeficients,
-            double max_traffic = 0) noexcept : nodes(normalizedNodePair(Node::NodePair(orig, dst))),
+            double max_traffic = 0) noexcept : nodes(Node::NodePair(orig, dst)),
     max_traffic(max_traffic),
     shared(std::make_shared<_shared>(std::move(coeficients))) {
     }
 
+    static Link getNewReversedLink(const Link& orig) noexcept;
+    
     Node getOrig() const noexcept {
         return nodes.first;
     }

@@ -71,6 +71,10 @@ namespace {
     }
 }
 
+Link Link::getNewReversedLink(const Link &orig) noexcept {
+    return Link(orig.nodes.second, orig.nodes.first, orig.shared->coefs, orig.max_traffic);
+}
+
 double Link::getCost(double lambda) const noexcept {
     double new_cost, current_cost;
 
@@ -88,7 +92,32 @@ double Link::updateCurrentPower() const noexcept {
     return shared->current_power;
 }
 
-ostream& operator<<(ostream& output, const Link& l) {    
+double Link::getCurrentCost(double flow_traffic) const noexcept {
+
+    struct restoreTraffic {
+
+        restoreTraffic(const Link *l, double t) : link(const_cast<Link *> (l)), traffic(t) {
+            if (t != 0.0)
+                link->addTraffic(-traffic);
+        }
+
+        ~restoreTraffic() {
+            link->addTraffic(traffic);
+        }
+
+    private:
+        Link *link;
+        const double traffic;
+    } restore(this, flow_traffic);
+
+    if (isCurrentPowerValid()) {
+        return shared->current_power;
+    }
+
+    return updateCurrentPower();
+}
+
+ostream& operator<<(ostream& output, const Link& l) {
     output << l.getOrig() << " → " << l.getDst();
 
     return output;

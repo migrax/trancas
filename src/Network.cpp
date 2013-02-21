@@ -44,7 +44,8 @@ Node Network::getNode(const std::string& nodeName) const throw (NetworkException
 
 void Network::add(const Link& l) noexcept {
     links.insert(l);
-    
+    links.insert(Link::getNewReversedLink(l));
+
     // Make both nodes known to each other
     l.getOrig().add(l.getDst());
     l.getDst().add(l.getOrig());
