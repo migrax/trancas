@@ -31,22 +31,23 @@
 
 class BackwardAnt : public Ant {
 public:
-    BackwardAnt(ForwardAnt&& ant) throw(AntException): Ant(std::move(ant.route), ant.traffic) {
-        if (route.isLast() == false) {
+
+    BackwardAnt(ForwardAnt&& ant) throw (AntException) : Ant(std::move(ant.route), ant.traffic) {
+        linkCosts = std::move(ant.linkCosts);
+
+        if (linkCosts.top().first != route.back()) {
             throw AntException("Backward ants must start at the end of the route");
         }
-        
-        linkCosts = std::move(ant.linkCosts);
     }
 
-    Node advance() throw(AntException);
-    Network::RouteInfo getRoute() throw(AntException);    
+    Node advance() throw (AntException);
+    Network::RouteInfo getRoute() throw (AntException);
 private:
     Route newRoute;
     bool reversed = false;
     double routeCost = 0;
-    
-    void prepareRoute() throw(AntException);
+
+    void prepareRoute() throw (AntException);
 };
 
 #endif	/* BACKWARDANT_H */
