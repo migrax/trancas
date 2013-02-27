@@ -24,8 +24,6 @@
 #include "Network.h"
 #include "Link.h"
 
-#include <iostream>
-
 using namespace std;
 
 const Node& ForwardAnt::chooseRandomNeighbour() const noexcept {
@@ -51,9 +49,7 @@ const Node& ForwardAnt::chooseNextNode() const noexcept {
         return chooseGoodNeighbour();
 }
 
-void ForwardAnt::pruneStack(const Node& rNode) noexcept {
-    // cerr << "Pruning until node " << rNode << " size: " << linkCosts.size() << ": ";
-
+void ForwardAnt::pruneStack(const Node& rNode) noexcept {    
     do {
         visitedNodes.erase(linkCosts.top().first);
         // cerr << " Pop!(" << linkCosts.top().first << ") ";
@@ -71,14 +67,11 @@ double ForwardAnt::getCost(const Node& left, const Node& right) const noexcept {
     } else {
         cost = l.getCost(traffic);
     }
-
-    cerr << " cost: " << cost << ' ';
+    
     return cost;
 }
 
-Node ForwardAnt::advance() throw (AntException) {
-    cerr << "At " << currentNode << ": ";
-
+Node ForwardAnt::advance() throw (AntException) {    
     // If we are in an already visited node. Pop information about it from the stack
     if (visitedNodes.find(currentNode) != visitedNodes.end()) {
         pruneStack(currentNode);
@@ -86,8 +79,7 @@ Node ForwardAnt::advance() throw (AntException) {
 
     visitedNodes.insert(currentNode);
 
-    Node next = chooseNextNode();
-    cerr << " ¿" << next << "? ";
+    Node next = chooseNextNode();    
     assert(currentNode != next);
 
     // Force random if the chosen node has already been visited
@@ -96,8 +88,6 @@ Node ForwardAnt::advance() throw (AntException) {
     assert(currentNode != next);
 
     linkCosts.push(make_pair(next, getCost(currentNode, next)));
-
-    cerr << " going to " << next << endl;
 
     return currentNode = next;
 }
@@ -111,10 +101,7 @@ void ForwardAnt::dump() noexcept {
     }
 
     while (!rcost.empty()) {
-        cerr << rcost.top().second << " → " << rcost.top().first << ' ';
         linkCosts.push(rcost.top());
         rcost.pop();
-    }
-
-    cerr << endl;
+    }    
 }
