@@ -48,12 +48,14 @@ public:
     virtual Node advance() throw(AntException) = 0;
     
     friend class BackwardAnt;
-protected:    
+protected:
+    typedef std::pair<Node, double> linkInfo;
+    
     Route route;    
     double traffic;
     
     // Internal state
-    std::stack<std::pair<Node, double> > linkCosts;
+    std::stack<linkInfo> linkCosts;
 };
 
 #endif	/* ANT_H */

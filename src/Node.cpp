@@ -39,71 +39,105 @@ int Node::genId() noexcept {
 
 void Node::add(const Node& neighbour) noexcept {
     auto cindex = status->neighboursIndex.find(neighbour);
-    
+
     if (cindex == status->neighboursIndex.end()) {
         status->neighbours.push_back(Neighbour(neighbour));
         status->neighboursIndex[neighbour] = status->neighbours.size() - 1;
     } else {
         // Replace it!
         status->neighbours[cindex->second] = Neighbour(neighbour);
-    }    
+    }
 }
 
 double Node::addTraffic(const Node& neighbour, double traffic) throw (NodeException) {
     auto i = status->neighboursIndex.find(neighbour);
-    
+
     if (i == status->neighboursIndex.end()) {
         throw NodeException("Node " + string(neighbour) + " is not a neighbour of " + getName());
     }
-    
+
     return status->neighbours[i->second].addTraffic(traffic);
 }
 
 void Node::cleanRoute(const NodePair& np) noexcept {
     // (FIXME: uniform or 1 for chosen?. 1 for chosen looks bad for convergency speed)
-    double prob = 1.0/(status->neighbours.size());
-    
+    double prob = 1.0 / (status->neighbours.size());
+
     for (Neighbour& neigh : status->neighbours) {
         neigh.setProb(np, prob);
     }
 }
 
-const Node& Node::getRandomNeighbour(const std::string& avoid) const noexcept {        
+const Node& Node::getRandomNeighbour(const std::string& avoid) const noexcept {
     vector<Neighbour>::size_type index;
-    
+
     do {
-        index = Simulation::getRandom<vector<Neighbour>::size_type>(0, status->neighbours.size() - 1);        
-    } while(avoid == status->neighbours[index].getName());
-    
+        index = Simulation::getRandom<vector<Neighbour>::size_type>(0, status->neighbours.size() - 1);
+    } while (avoid == status->neighbours[index].getName());
+
     return status->neighbours[index].getNode();
 }
 
 const Node& Node::getGoodNeighbour(const NodePair& routeEnds, const std::string& avoid) const noexcept {
     vector<Neighbour>::size_type index;
-    
+
     do {
         // FIXME: brute force search
-        double acumul = 0.0;    
-        double prob = Simulation::getRandom();        
-        
-        for (index = 0; index < status->neighbours.size(); index++) {        
+        double acumul = 0.0;
+        double prob = Simulation::getRandom();
+
+        for (index = 0; index < status->neighbours.size(); index++) {
             acumul += getProb(routeEnds, index);
             if (prob <= acumul)
                 break;
-        }        
+        }
         assert(index < status->neighbours.size());
-    } while(avoid == status->neighbours[index].getName());       
-    
+    } while (avoid == status->neighbours[index].getName());
+
     return status->neighbours[index].getNode();
 }
 
 double Node::getProb(const NodePair& routeEnds, vector<Neighbour>::size_type index) const noexcept {
     double prob = status->neighbours[index].getProb(routeEnds);
-    
+
     if (prob < 0)
-        const_cast<Node *>(this)->cleanRoute(routeEnds); // Just uninitialize stuff
-    
+        const_cast<Node *> (this)->cleanRoute(routeEnds); // Just uninitialize stuff
+
     return status->neighbours[index].getProb(routeEnds);
+}
+
+void Node::updateStats(const Route& r, const Node& neigh, double cost) noexcept {
+    const pair<const Node&, const Node&> np = make_pair(r.front(), r.back());
+
+    status->trips[np][neigh].addSample(cost);
+}
+
+Node Node::calcNextHop(const Route& r, const Node& prev) noexcept {
+    static const Node dummy("Dummy node in calcNextHop");
+    const pair<const Node&, const Node&> np = make_pair(r.front(), r.back());
+    const double rp = status->trips[np][prev].getCorrectedRPrime();
+    Node nextHop = dummy;
+    double higherProb = 0.0;
+
+    for (Neighbour& n : status->neighbours) {        
+        double prob = n.getProb(np);        
+
+        if (n.getNode() == prev) {
+            prob += (1 - rp) * (1 - prob);
+        } else {
+            prob += -(1 - rp) * prob;
+        }
+
+        n.setProb(np, prob);
+        if (prob > higherProb) {
+            higherProb = prob;
+            nextHop = n.getNode();
+        }
+
+        assert(0 <= prob && prob <= 1);
+    }    
+
+    return nextHop;
 }
 
 Node::Neighbour::Neighbour(const Node& node) noexcept : node(make_shared<Node>(node)), status(std::make_shared<_status> ()) {

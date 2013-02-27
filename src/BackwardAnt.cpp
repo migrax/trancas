@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <utility>
 
 using namespace std;
 
@@ -31,12 +32,15 @@ void BackwardAnt::prepareRoute() throw (AntException) {
         throw AntException("Cannot give complete route until I reach " + string(route.getSrc()));
     }    
     
-    if (!reversed) {
+    // Origin route has yet to be added to the route
+    newRoute.push_back(route.getSrc());
+    
+    if (!prepared) {        
         reverse(newRoute.begin(), newRoute.end());
-        reversed = true;
+        prepared = true;
     }
     
-    assert(route.getSrc() == newRoute.front());
+    assert(route.getDst() == newRoute.back());
 }
 
 Network::RouteInfo BackwardAnt::getRoute() throw (AntException) {
@@ -45,13 +49,34 @@ Network::RouteInfo BackwardAnt::getRoute() throw (AntException) {
     return make_pair(route, routeCost);
 }
 
-Node BackwardAnt::advance() throw(AntException) {
-    // FIXME: Dummy implementation
+Node BackwardAnt::advance() throw(AntException) {    
     pair<Node, double> lc = linkCosts.top();
-    routeCost += lc.second;
-    newRoute.push_back(lc.first);
+    Node& current = lc.first;    
+    
+    double cost = 0.0;
+    for (auto i = reversedNodes.rbegin(); i < reversedNodes.rend(); i++) {
+        // The most recently added node is the closest
+        cost += i->second;
+        current.updateStats(route, i->first, cost);
+    }
+    
+    // Update probabilities and get current nexto hop for route /route/
+    if (!reversedNodes.empty()) {
+        newRoute.push_back(current.calcNextHop(route, reversedNodes.back().first));
+    }
+    
+    // Store the info about the current node for the next one
+    reversedNodes.push_back(lc);
+    /* Algorithm:
+     * a) Drop prev. node from stack and add it to a vector of visited nodes
+     * b) Update trip costs from current node to all previous nodes
+     * c) Update probabilities
+     * d) Modify routes?. Save if to tell the source
+     * e) At the src, update the route
+     */   
     
     linkCosts.pop();
     
+    // Go to parent node
     return lc.first;
 }

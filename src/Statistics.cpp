@@ -19,39 +19,7 @@
  *
  */
 
-#include "config.h"
+#include "Statistics.h"
 
-#ifndef BACKWARDANT_H
-#define	BACKWARDANT_H
-
-#include "ForwardAnt.h"
-#include "Network.h"
-
-#include <utility>
-#include <vector>
-
-class BackwardAnt : public Ant {
-public:
-
-    BackwardAnt(ForwardAnt&& ant) throw (AntException) : Ant(std::move(ant.route), ant.traffic) {
-        linkCosts = std::move(ant.linkCosts);
-
-        if (linkCosts.top().first != route.back()) {
-            throw AntException("Backward ants must start at the end of the route");
-        }
-    }
-
-    Node advance() throw (AntException);
-    Network::RouteInfo getRoute() throw (AntException);
-private:
-    std::vector<linkInfo> reversedNodes = std::vector<linkInfo>();
-    Route newRoute;
-    
-    bool prepared = false;
-    double routeCost = 0;
-
-    void prepareRoute() throw (AntException);
-};
-
-#endif	/* BACKWARDANT_H */
-
+const double Statistics::a = 10.0;
+const double Statistics::aPrime = 9.0;

@@ -34,6 +34,7 @@
 #include <boost/operators.hpp>
 
 #include "TrancasException.h"
+#include "Statistics.h"
 
 class Route;
 
@@ -66,6 +67,9 @@ public:
     
     const Node& getRandomNeighbour(const std::string& avoid = "") const noexcept;
     const Node& getGoodNeighbour(const NodePair& routeEnds, const std::string& avoid = "") const noexcept;
+    
+    void updateStats(const Route& r, const Node& neigh, double cost) noexcept;
+    Node calcNextHop(const Route& r, const Node& prev) noexcept;
     
     bool operator==(const Node& b) const noexcept {
         return id == b.id;
@@ -117,6 +121,8 @@ private:
     struct InternalStatus {                        
         std::map<std::string, std::vector<Neighbour>::size_type> neighboursIndex;
         std::vector<Neighbour> neighbours;
+        /* trip_route(destination) = statistics */
+        std::map<NodePair, std::map<std::string, Statistics> > trips;
     };
     std::shared_ptr<InternalStatus> status;
 

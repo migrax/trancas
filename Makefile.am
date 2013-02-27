@@ -12,6 +12,8 @@ trancas_SOURCES = src/main.cpp \
 		  src/Network.cpp \
 		  src/ShortestPath.cpp \
 		  src/Dijkstra.cpp \
-		  src/Route.cpp
+		  src/Route.cpp \
+		  src/Simulation.cpp \
+		  src/Statistics.cpp
 
 dist_noinst_SCRIPTS = autogen.sh

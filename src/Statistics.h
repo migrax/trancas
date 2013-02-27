@@ -26,6 +26,8 @@
 
 #include <cmath>
 #include <limits>
+#include <algorithm>
+#include <functional>
 
 /* We employ a exponentially moving average to adapt
  * to changes in the traffic matrix
@@ -44,7 +46,13 @@ public:
         return var;
     }
 
+    double Deviation() const noexcept {
+        return sqrt(Variance());
+    }
+
     double addSample(double sample) noexcept {
+        lastSample = sample;
+
         if (init) {
             const double err = sample - mean;
 
@@ -52,7 +60,7 @@ public:
             var += gain * (fabs(err) - var);
         } else {
             init = true;
-            
+
             mean = sample;
             var = mean * mean; // Bad enough (but not too bad) initial value?
         }
@@ -64,12 +72,58 @@ public:
         return addSample(sample);
     }
 
+    double getRPrime() const noexcept {
+        return std::min(1.0, lastSample / (c * Mean()));
+    }
+
+    double getCorrectedRPrime() const noexcept {
+        double rp = getRPrime();
+        const double dOm = Deviation() / Mean();
+        std::function<double (void) > f;
+
+        if (dOm < epsilon) {
+            f = std::bind(&Statistics::S, this);
+        } else {
+            f = std::bind(&Statistics::U, this);
+        }
+
+        double fval = f();
+        rp += sign(threshold - rp) * sign(dOm - epsilon) * fval;
+        rp = bound(rp, 0., 1.);
+        
+        return pow(rp, h);
+    }
+
 private:
-    double mean = std::numeric_limits<double>::quiet_NaN();
+    double mean = std::numeric_limits<double>::signaling_NaN();
     double var = std::numeric_limits<double>::infinity();
     bool init = false;
+    double lastSample = std::numeric_limits<double>::signaling_NaN();
+
+    double S() const noexcept {
+        return exp(-a * Deviation() / Mean());
+    }
+
+    double U() const noexcept {
+        return 1 - exp(-aPrime * Deviation() / Mean());
+    }
+
+    template <typename T>
+    static int sign(T val) {
+        return (T(0) < val) - (val <= T(0)); // val <= T(0) to five precedence to substract for rp == threshold
+    }
+    template <typename T>
+    static T bound(T val, T min, T max) {
+        return std::min(std::max(min, val), max);
+    }
 
     static constexpr double gain = 0.1;
+    static constexpr double c = 2.0;
+    static constexpr double threshold = 0.5;
+    static const double a;
+    static const double aPrime;
+    static constexpr double epsilon = 0.25;
+    static constexpr double h = 0.04;
 };
 
 #endif	/* STATISTICS_H */
