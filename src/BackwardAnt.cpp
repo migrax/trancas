@@ -43,10 +43,10 @@ void BackwardAnt::prepareRoute() throw (AntException) {
     assert(route.getDst() == newRoute.back());
 }
 
-Network::RouteInfo BackwardAnt::getRoute() throw (AntException) {
+Route BackwardAnt::getRoute() throw (AntException) {
     prepareRoute();
     
-    return make_pair(newRoute, routeCost);
+    return newRoute;
 }
 
 Node BackwardAnt::advance() throw(AntException) {    

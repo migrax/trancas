@@ -26,6 +26,7 @@
 
 #include <set>
 #include <map>
+#include <ostream>
 
 #include "Node.h"
 #include "Link.h"
@@ -64,8 +65,11 @@ public:
     
     void addNewRoute(const Route& r, double traffic) throw (TrancasException);    
     
-    Route addTraffic(Node orig, const Node& dst, double traffic) throw(TrancasException);
-    Route sendAnt(Node orig, const Node& dst) const throw(TrancasException);    
+    RouteInfo addTraffic(Node orig, const Node& dst, double traffic) throw(TrancasException);
+    RouteInfo sendAnt(Node orig, const Node& dst) throw(TrancasException);
+
+    RouteInfo getRoute(const Node& orig, const Node& dst) const throw(NetworkException);
+    double getTotalCost() const noexcept;
     // addtraffic
     // removetraffic
     // sendant
@@ -74,7 +78,11 @@ private:
     std::set<Link> links;
     std::map<std::string, std::set<Node> > nodeEdges;
     std::map<std::pair<std::string, std::string>, RouteInfo> routes;
+    
+    RouteInfo updateRoute(Route& newRoute) noexcept;
 };
+
+std::ostream& operator<<(std::ostream& os, const Network::RouteInfo& i);
 
 #endif	/* NETWORK_H */
 

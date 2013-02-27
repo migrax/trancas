@@ -42,7 +42,7 @@ public:
     }
 
     Node advance() throw (AntException);
-    Network::RouteInfo getRoute() throw (AntException);
+    Route getRoute() throw (AntException);
 private:
     std::vector<linkInfo> reversedNodes = std::vector<linkInfo>();
     Route newRoute;

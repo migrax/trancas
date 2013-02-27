@@ -51,8 +51,7 @@ const Node& ForwardAnt::chooseNextNode() const noexcept {
 
 void ForwardAnt::pruneStack(const Node& rNode) noexcept {    
     do {
-        visitedNodes.erase(linkCosts.top().first);
-        // cerr << " Pop!(" << linkCosts.top().first << ") ";
+        visitedNodes.erase(linkCosts.top().first);        
         linkCosts.pop();
     } while (linkCosts.top().first != rNode);    
 }

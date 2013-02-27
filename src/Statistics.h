@@ -87,8 +87,12 @@ public:
             f = std::bind(&Statistics::U, this);
         }
 
-        double fval = f();
-        rp += sign(threshold - rp) * sign(dOm - epsilon) * fval;
+        if (rp < threshold) {
+            rp += f();
+        } else {
+            rp -= f();
+        }
+                
         rp = bound(rp, 0., 1.);
         
         return pow(rp, h);
@@ -101,17 +105,13 @@ private:
     double lastSample = std::numeric_limits<double>::signaling_NaN();
 
     double S() const noexcept {
-        return exp(-a * Deviation() / Mean());
+        return -exp(-a * Deviation() / Mean());
     }
 
     double U() const noexcept {
         return 1 - exp(-aPrime * Deviation() / Mean());
     }
 
-    template <typename T>
-    static int sign(T val) {
-        return (T(0) < val) - (val <= T(0)); // val <= T(0) to five precedence to substract for rp == threshold
-    }
     template <typename T>
     static T bound(T val, T min, T max) {
         return std::min(std::max(min, val), max);

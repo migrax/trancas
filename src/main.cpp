@@ -34,9 +34,9 @@ using namespace std;
 
 int main(int argc, char **argv) {
     constexpr double log_e_10 = log(10);
-    
+
     Simulation::setRandomSeed(1); // Always the same value for debugging
-    
+
     try {
         Network net;
         Node a("A"), b("B"), c("C"), d("D"), e("E"), f("F");
@@ -54,10 +54,23 @@ int main(int argc, char **argv) {
         net.add(Link(d, e,{0, 0, 1}));
         net.add(Link(d, f,{0, 0, 1}));
 
-        cout << net.addTraffic(a, e, 10) << endl       
-             << net.addTraffic(a, f, 10) << endl;
+        cout << net.addTraffic(a, e, 10) << endl;
+        cout << net.addTraffic(a, f, 10) << endl;
 
-        cout << net.sendAnt(a, f) << endl;
+        for (int i = 1; i <= 500; i++) {
+            cout << i << ": " << net.sendAnt(a, e) << endl;
+            cout << i << ": " << net.sendAnt(a, f) << endl;
+        }        
+
+        for (int i = 501; i <= 1000; i++) {
+            cout << i << ": " << net.sendAnt(a, e) << endl;
+            cout << i << ": " << net.sendAnt(a, f) << endl;
+        }
+        
+        cout << endl <<  "Summary:" << endl;
+        cout << net.getRoute(a, e) << endl;
+        cout << net.getRoute(a, f) << endl;
+        cout << "Total cost: " << net.getTotalCost() << endl;
     } catch (const exception& e) {
         cerr << "Error: " << e.what() << endl;
     }

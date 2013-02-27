@@ -112,7 +112,7 @@ public:
 
         return getCurrent();
     }
-
+    
 private:
     size_type index = 0;
     mutable std::set<Node::NodePair> edges;

@@ -57,7 +57,7 @@ void Network::add(const Link& l) noexcept {
 void Network::addNewRoute(const Route& r, double traffic) throw (TrancasException) {
     const Node& orig = r.front();
     const Node& dst = r.back();
-    pair<string, string> np = make_pair(orig, dst);
+    pair<string, string> np(orig, dst);
     auto ci = routes.find(np);
 
     if (ci != routes.end()) {
@@ -82,7 +82,7 @@ Link Network::getLink(const Node::NodePair& np) const throw (NetworkException) {
     return *clink;
 }
 
-Route Network::addTraffic(Node orig, const Node& dst, double traffic) throw (TrancasException) {
+Network::RouteInfo Network::addTraffic(Node orig, const Node& dst, double traffic) throw (TrancasException) {
     /* Algorithm:
      * a) Calculate route (link collection)
      * b) Update info at orig node
@@ -92,28 +92,100 @@ Route Network::addTraffic(Node orig, const Node& dst, double traffic) throw (Tra
     Dijkstra spf(orig, dst, *this, traffic);
 
     Route r = spf.getRoute();
+    double cost = 0.0;
     for (auto i = r.begin(); i < r.end() - 1; i++) {
         Link l = getLink(make_pair(*i, *(i + 1)));
+        cost += l.getCost(traffic);
         l.addTraffic(traffic);
 
         i->addTraffic(*(i + 1), traffic);
     }
     addNewRoute(r, traffic);
 
-    return r;
+    return RouteInfo(move(r), cost);
 }
 
-Route Network::sendAnt(Node orig, const Node& dst) const throw (TrancasException) {
+Network::RouteInfo Network::sendAnt(Node orig, const Node& dst) throw (TrancasException) {
     auto ci = routes.find(make_pair(orig, dst));
     if (ci == routes.end())
         throw RouteException("No such route from " + string(orig) + " to " + string(dst) + '.');
 
-    ForwardAnt trancas(*this, ci->second.first, ci->second.second);
+    RouteInfo rInfo(ci->second); // Route, traffic
+    ForwardAnt trancas(*this, rInfo.first, rInfo.second);
 
     while (dst != trancas.advance());
     trancas.dump();
     BackwardAnt barrancas(move(trancas));
     while (orig != barrancas.advance());
 
-    return barrancas.getRoute().first;
+    Route newRoute = barrancas.getRoute();
+    if (newRoute != rInfo.first) { // Route has changed        
+        rInfo = updateRoute(newRoute); // Route, cost
+    }
+
+    return rInfo;
+}
+
+Network::RouteInfo Network::updateRoute(Route& newRoute) noexcept {
+    std::pair<const Node&, const Node&> np(newRoute.front(), newRoute.back());
+    auto ori = routes.find(np);
+    assert(ori != routes.end());
+    Route& oldRoute = ori->second.first;
+    const double traffic = ori->second.second;
+
+    // Remove the traffic from the old route
+    for (auto i = oldRoute.begin(); i < oldRoute.end() - 1; i++) {
+        Link l = getLink(make_pair(*i, *(i + 1)));
+        l.removeTraffic(traffic);
+
+        i->removeTraffic(*(i + 1), traffic);
+    }
+
+    // Add it to the new route
+    double cost = 0.0;
+    for (auto i = newRoute.begin(); i < newRoute.end() - 1; i++) {
+        Link l = getLink(make_pair(*i, *(i + 1)));
+        l.addTraffic(traffic);
+
+        i->addTraffic(*(i + 1), traffic);
+
+        cost += l.getCurrentCost(traffic);
+    }
+
+
+    ori->second = RouteInfo(newRoute, traffic);
+
+    return RouteInfo(newRoute, cost);
+}
+
+Network::RouteInfo Network::getRoute(const Node& orig, const Node& dst) const throw (NetworkException) {
+    auto ci = routes.find(make_pair(orig, dst));
+    if (ci == routes.end())
+        throw RouteException("No such route from " + string(orig) + " to " + string(dst) + '.');
+    
+    const Route& route = ci->second.first;
+    const double traffic = ci->second.second;
+    double cost = 0.0;
+    
+    for (auto i = route.begin(); i < route.end() - 1; i++) {
+        Link l = getLink(make_pair(*i, *(i + 1)));
+
+        cost += l.getCurrentCost(traffic);
+    }
+    
+    return RouteInfo(route, cost);
+}
+
+double Network::getTotalCost() const noexcept {
+    double cost = 0.0;
+
+    for (const Link& l : links) {
+        cost += l.getCurrentCost();
+    }
+
+    return cost;
+}
+
+std::ostream& operator<<(std::ostream& os, const Network::RouteInfo& i) {
+    return os << i.first << " (" << i.second << ')';
 }

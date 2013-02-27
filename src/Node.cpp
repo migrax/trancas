@@ -23,8 +23,6 @@
 #include "Ant.h"
 #include "Simulation.h"
 
-#include <iostream>
-
 using namespace std;
 
 Node::Node(const std::string& name) noexcept :
@@ -57,6 +55,16 @@ double Node::addTraffic(const Node& neighbour, double traffic) throw (NodeExcept
     }
 
     return status->neighbours[i->second].addTraffic(traffic);
+}
+
+double Node::removeTraffic(const Node& neighbour, double traffic) throw (NodeException) {
+    auto i = status->neighboursIndex.find(neighbour);
+
+    if (i == status->neighboursIndex.end()) {
+        throw NodeException("Node " + string(neighbour) + " is not a neighbour of " + getName());
+    }
+
+    return status->neighbours[i->second].removeTraffic(traffic);
 }
 
 void Node::cleanRoute(const NodePair& np) noexcept {
@@ -107,20 +115,20 @@ double Node::getProb(const NodePair& routeEnds, vector<Neighbour>::size_type ind
 }
 
 void Node::updateStats(const Route& r, double cost) noexcept {
-    const pair<const Node&, const Node&> np = make_pair(r.front(), r.back());
+    const pair<const Node&, const Node&> np(r.front(), r.back());
 
     status->trips[np].addSample(cost);
 }
 
 Node Node::calcNextHop(const Route& r, const Node& prev) noexcept {
     static const Node dummy("Dummy node in calcNextHop");
-    const pair<const Node&, const Node&> np = make_pair(r.front(), r.back());
+    const pair<const Node&, const Node&> np(r.front(), r.back());
     const double rp = status->trips[np].getCorrectedRPrime();
     Node nextHop = dummy;
     double higherProb = 0.0;
 
-    for (Neighbour& n : status->neighbours) {        
-        double prob = n.getProb(np);        
+    for (Neighbour& n : status->neighbours) {
+        double prob = n.getProb(np);
 
         if (n.getNode() == prev) {
             prob += (1 - rp) * (1 - prob);
@@ -135,7 +143,7 @@ Node Node::calcNextHop(const Route& r, const Node& prev) noexcept {
         }
 
         assert(0 <= prob && prob <= 1);
-    }    
+    }
 
     return nextHop;
 }

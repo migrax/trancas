@@ -62,6 +62,7 @@ public:
     void add(const Node& neighbour) noexcept;
 
     double addTraffic(const Node& neighbour, double traffic) throw (NodeException);    
+    double removeTraffic(const Node& neighbour, double traffic) throw (NodeException);    
 
     void cleanRoute(const NodePair& np) noexcept;
     
@@ -92,11 +93,11 @@ private:
     public:
         Neighbour(const Node& node) noexcept;        
 
-        double addTraffic(double traffic) {
+        double addTraffic(double traffic) noexcept {
             return status->currentTraffic += traffic;
-        }
+        }                
 
-        double rmTraffic(double traffic) {
+        double removeTraffic(double traffic) noexcept {
             assert((status->currentTraffic -= traffic) >= 0);
             return status->currentTraffic;
         }
