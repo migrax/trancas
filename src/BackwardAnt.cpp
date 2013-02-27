@@ -46,7 +46,7 @@ void BackwardAnt::prepareRoute() throw (AntException) {
 Network::RouteInfo BackwardAnt::getRoute() throw (AntException) {
     prepareRoute();
     
-    return make_pair(route, routeCost);
+    return make_pair(newRoute, routeCost);
 }
 
 Node BackwardAnt::advance() throw(AntException) {    
