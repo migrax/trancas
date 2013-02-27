@@ -58,7 +58,7 @@ Node BackwardAnt::advance() throw(AntException) {
     if (!reversedNodes.empty()) {
         const Node& prevNode = reversedNodes.back().first;
         
-        current.updateStats(route, prevNode, routeCost);
+        current.updateStats(route, routeCost);
         newRoute.push_back(current.calcNextHop(route, prevNode));
     }
     

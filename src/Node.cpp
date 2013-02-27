@@ -106,16 +106,16 @@ double Node::getProb(const NodePair& routeEnds, vector<Neighbour>::size_type ind
     return status->neighbours[index].getProb(routeEnds);
 }
 
-void Node::updateStats(const Route& r, const Node& neigh, double cost) noexcept {
+void Node::updateStats(const Route& r, double cost) noexcept {
     const pair<const Node&, const Node&> np = make_pair(r.front(), r.back());
 
-    status->trips[np][neigh].addSample(cost);
+    status->trips[np].addSample(cost);
 }
 
 Node Node::calcNextHop(const Route& r, const Node& prev) noexcept {
     static const Node dummy("Dummy node in calcNextHop");
     const pair<const Node&, const Node&> np = make_pair(r.front(), r.back());
-    const double rp = status->trips[np][prev].getCorrectedRPrime();
+    const double rp = status->trips[np].getCorrectedRPrime();
     Node nextHop = dummy;
     double higherProb = 0.0;
 
