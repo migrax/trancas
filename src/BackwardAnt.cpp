@@ -50,26 +50,23 @@ Network::RouteInfo BackwardAnt::getRoute() throw (AntException) {
 }
 
 Node BackwardAnt::advance() throw(AntException) {    
-    pair<Node, double> lc = linkCosts.top();
+    linkInfo& lc = linkCosts.top();
     Node& current = lc.first;    
-    
-    double cost = 0.0;
-    for (auto i = reversedNodes.rbegin(); i < reversedNodes.rend(); i++) {
-        // The most recently added node is the closest
-        cost += i->second;
-        current.updateStats(route, i->first, cost);
-    }
-    
+    routeCost += lc.second;
+        
     // Update probabilities and get current nexto hop for route /route/
     if (!reversedNodes.empty()) {
-        newRoute.push_back(current.calcNextHop(route, reversedNodes.back().first));
+        const Node& prevNode = reversedNodes.back().first;
+        
+        current.updateStats(route, prevNode, routeCost);
+        newRoute.push_back(current.calcNextHop(route, prevNode));
     }
     
     // Store the info about the current node for the next one
-    reversedNodes.push_back(lc);
+    reversedNodes.push_back(move(lc));
     /* Algorithm:
      * a) Drop prev. node from stack and add it to a vector of visited nodes
-     * b) Update trip costs from current node to all previous nodes
+     * b) Update trip cost from current node to route destination
      * c) Update probabilities
      * d) Modify routes?. Save if to tell the source
      * e) At the src, update the route
