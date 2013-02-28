@@ -75,9 +75,7 @@ public:
     RouteInfo removeTrafficFromRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);
     
     double getTotalCost() const noexcept;
-    // addtraffic
-    // removetraffic
-    // sendant
+    double getTotalTraffic() const noexcept;
 private:
     std::map<std::string, Node> nodes;
     std::set<Link> links;

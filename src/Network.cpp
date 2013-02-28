@@ -229,6 +229,16 @@ double Network::getTotalCost() const noexcept {
     return cost;
 }
 
+double Network::getTotalTraffic() const noexcept {
+    double traffic = 0.0;
+    
+    for (const pair<pair<string, string>, RouteInfo> ri : routes) {
+        traffic += ri.second.second;
+    }
+    
+    return traffic;
+}
+
 std::ostream& operator<<(std::ostream& os, const Network::RouteInfo& i) {
     return os << i.first << " (" << i.second << ')';
 }
