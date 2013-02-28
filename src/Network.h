@@ -71,20 +71,8 @@ public:
     RouteInfo getRoute(const Node& orig, const Node& dst) const throw(NetworkException);
     RouteInfo getRoute(const Node::NodePair& np) const throw(NetworkException);
 
-    double addTrafficToRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException) {
-        if (traffic < 0.0) {
-            throw NetworkException("Can only add positive values of traffic to a route");
-        }
-        
-        return changeTrafficInRoute(orig, dst, traffic);
-    }
-    double removeTrafficFromRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException) {
-        if (traffic < 0.0) {
-            throw NetworkException("Can only remove positive values of traffic from a route");
-        }
-        
-        return changeTrafficInRoute(orig, dst, -traffic);
-    }
+    RouteInfo addTrafficToRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);        
+    RouteInfo removeTrafficFromRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);
     
     double getTotalCost() const noexcept;
     // addtraffic
@@ -97,7 +85,7 @@ private:
     std::map<std::pair<std::string, std::string>, RouteInfo> routes;
     
     RouteInfo updateRoute(Route& newRoute) noexcept;
-    double changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);
+    RouteInfo changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);
 };
 
 std::ostream& operator<<(std::ostream& os, const Network::RouteInfo& i);

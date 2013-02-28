@@ -180,10 +180,26 @@ Network::RouteInfo Network::getRoute(const Node::NodePair& np) const throw (Netw
     return getRoute(np.first, np.second);
 }
 
-double Network::changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) throw (NetworkException) {
+Network::RouteInfo Network::addTrafficToRoute(const Node& orig, const Node& dst, double traffic) throw (NetworkException) {
+    if (traffic < 0.0) {
+        throw NetworkException("Can only add positive values of traffic to a route");
+    }
+
+    return changeTrafficInRoute(orig, dst, traffic);
+}
+
+Network::RouteInfo Network::removeTrafficFromRoute(const Node& orig, const Node& dst, double traffic) throw (NetworkException) {
+    if (traffic < 0.0) {
+        throw NetworkException("Can only remove positive values of traffic from a route");
+    }
+
+    return changeTrafficInRoute(orig, dst, -traffic);
+}
+
+Network::RouteInfo Network::changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) throw (NetworkException) {
     auto ci = routes.find(make_pair(orig, dst));
     if (ci == routes.end())
-        throw RouteException("No such route from " + string(orig) + " to " + string(dst) + '.');
+        return addTraffic(orig, dst, traffic);
 
     Route& route = ci->second.first;
     double& curTraffic = ci->second.second;
@@ -197,10 +213,10 @@ double Network::changeTrafficInRoute(const Node& orig, const Node& dst, double t
         l.addTraffic(traffic);
         i->addTraffic(*(i + 1), traffic);
     }
-    
+
     curTraffic += traffic;
-    
-    return curTraffic;
+
+    return ci->second;
 }
 
 double Network::getTotalCost() const noexcept {
