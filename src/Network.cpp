@@ -105,7 +105,7 @@ Network::RouteInfo Network::addTraffic(Node orig, const Node& dst, double traffi
     return RouteInfo(move(r), cost);
 }
 
-Network::RouteInfo Network::sendAnt(Node orig, const Node& dst) throw (TrancasException) {
+Network::RouteInfo Network::sendAnt(Node orig, const Node& dst, bool *changed) throw (TrancasException) {
     auto ci = routes.find(make_pair(orig, dst));
     if (ci == routes.end())
         throw RouteException("No such route from " + string(orig) + " to " + string(dst) + '.');
@@ -119,8 +119,10 @@ Network::RouteInfo Network::sendAnt(Node orig, const Node& dst) throw (TrancasEx
     while (orig != barrancas.advance());
 
     Route newRoute = barrancas.getRoute();
-    if (newRoute != rInfo.first) { // Route has changed        
+    if (newRoute != rInfo.first) { // Route has changed
         rInfo = updateRoute(newRoute); // Route, cost
+        if (changed)
+            *changed = true;
     }
 
     return rInfo;

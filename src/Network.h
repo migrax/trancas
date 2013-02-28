@@ -66,7 +66,7 @@ public:
     void addNewRoute(const Route& r, double traffic) throw (TrancasException);    
     
     RouteInfo addTraffic(Node orig, const Node& dst, double traffic) throw(TrancasException);
-    RouteInfo sendAnt(Node orig, const Node& dst) throw(TrancasException);
+    RouteInfo sendAnt(Node orig, const Node& dst, bool *changed = nullptr) throw(TrancasException);
 
     RouteInfo getRoute(const Node& orig, const Node& dst) const throw(NetworkException);
     RouteInfo getRoute(const Node::NodePair& np) const throw(NetworkException);
