@@ -94,6 +94,7 @@ private:
         Neighbour(const Node& node) noexcept;        
 
         double addTraffic(double traffic) noexcept {
+            assert((status->currentTraffic += traffic) >= 0);
             return status->currentTraffic += traffic;
         }                
 

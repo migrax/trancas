@@ -162,18 +162,45 @@ Network::RouteInfo Network::getRoute(const Node& orig, const Node& dst) const th
     auto ci = routes.find(make_pair(orig, dst));
     if (ci == routes.end())
         throw RouteException("No such route from " + string(orig) + " to " + string(dst) + '.');
-    
+
     const Route& route = ci->second.first;
     const double traffic = ci->second.second;
     double cost = 0.0;
-    
+
     for (auto i = route.begin(); i < route.end() - 1; i++) {
         Link l = getLink(make_pair(*i, *(i + 1)));
 
         cost += l.getCurrentCost(traffic);
     }
-    
+
     return RouteInfo(route, cost);
+}
+
+Network::RouteInfo Network::getRoute(const Node::NodePair& np) const throw (NetworkException) {
+    return getRoute(np.first, np.second);
+}
+
+double Network::changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) throw (NetworkException) {
+    auto ci = routes.find(make_pair(orig, dst));
+    if (ci == routes.end())
+        throw RouteException("No such route from " + string(orig) + " to " + string(dst) + '.');
+
+    Route& route = ci->second.first;
+    double& curTraffic = ci->second.second;
+
+    if (curTraffic + traffic < 0.0) {
+        throw NetworkException("Routes must have positive values from total traffic");
+    }
+
+    for (auto i = route.begin(); i < route.end() - 1; i++) {
+        Link l = getLink(make_pair(*i, *(i + 1)));
+        l.addTraffic(traffic);
+        i->addTraffic(*(i + 1), traffic);
+    }
+    
+    curTraffic += traffic;
+    
+    return curTraffic;
 }
 
 double Network::getTotalCost() const noexcept {
