@@ -1,0 +1,9 @@
+# Fish topology. Optimal route with both flows should be A->B->D->x for a total traffic of 54.31
+# Flows, declared in traffic file, are A->E (10) and A->F (10)
+# 4.777 is 11/ln(10) as simulator uses natural logarithms
+A B 0 4.777239301
+A C 0 0 0 1
+B D 0 0 0 1
+C D 0 0 0 1
+D E 0 0 0 1
+D F 0 0 0 1

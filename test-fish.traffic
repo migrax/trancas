@@ -1,0 +1,9 @@
+# Select a nice random seed
+S 1
+A A E 10
+A A F 10
+C A E
+C A F
+C
+T 100 1
+C
