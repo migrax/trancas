@@ -25,80 +25,195 @@
 #include "Network.h"
 #include "Route.h"
 
-#include <cmath>
+#include <cstring>
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <map>
 #include <exception>
 
 using namespace std;
 
-int main(int argc, char **argv) {
-    constexpr double log_e_10 = log(10);
+namespace {
+    string conf_prefix;
 
-    Simulation::setRandomSeed(1); // Always the same value for debugging
+    int usage(int argc, char** argv) {
+        cerr << "Usage: " << basename(argv[0]) << " prefix" << endl;
 
-    try {
-        Network net;
-        Node a("A"), b("B"), c("C"), d("D"), e("E"), f("F");
-        net.add(a);
-        net.add(b);
-        net.add(c);
-        net.add(d);
-        net.add(e);
-        net.add(f);
-
-        net.add(Link(a, b,{11. / log_e_10})); // 11/log_e(10)
-        net.add(Link(a, c,{0, 0, 1}));
-        net.add(Link(b, d,{0, 0, 1}));
-        net.add(Link(c, d,{0, 0, 1}));
-        net.add(Link(d, e,{0, 0, 1}));
-        net.add(Link(d, f,{0, 0, 1}));
-
-        cout << net.addTraffic(a, e, 10) << endl;
-
-        for (int i = 1; i <= 500; i++) {
-            cout << i << ": " << net.sendAnt(a, e) << endl;        
-        }
-        cout << net.addTraffic(a, f, 10) << endl;
-        for (int i = 501; i <= 1000; i++) {
-            cout << i << ": " << net.sendAnt(a, e) << endl;
-            cout << i << ": " << net.sendAnt(a, f) << endl;
-        }
-        
-        cout << net.addTraffic(a, b, 1) << endl;
-        for (int i = 1001; i <= 1250; i++) {
-            cout << i << ": " << net.sendAnt(a, e) << endl;
-            cout << i << ": " << net.sendAnt(a, f) << endl;
-        }
-        cout << net.addTrafficToRoute(a, b, 1) << endl;
-        for (int i = 1251; i <= 1350; i++) {
-            cout << i << ": " << net.sendAnt(a, e) << endl;
-            cout << i << ": " << net.sendAnt(a, f) << endl;
-        }
-        cout << net.addTrafficToRoute(a, b, 1) << endl;
-        for (int i = 1351; i <= 1450; i++) {
-            cout << i << ": " << net.sendAnt(a, e) << endl;
-            cout << i << ": " << net.sendAnt(a, f) << endl;
-        }
-        cout << net.addTrafficToRoute(a, b, 1) << endl;
-        for (int i = 1451; i <= 1550; i++) {
-            cout << i << ": " << net.sendAnt(a, e) << endl;
-            cout << i << ": " << net.sendAnt(a, f) << endl;
-        }
-        cout << net.addTrafficToRoute(a, b, 1) << endl;
-        for (int i = 1551; i <= 1650; i++) {
-            cout << i << ": " << net.sendAnt(a, e) << endl;
-            cout << i << ": " << net.sendAnt(a, f) << endl;
-        }
-
-        cout << endl << "Summary:" << endl;
-        cout << net.getRoute(a, e) << endl;
-        cout << net.getRoute(a, f) << endl;
-        cout << "Total cost: " << net.getTotalCost() << endl;
-    } catch (const exception& e) {
-        cerr << "Error: " << e.what() << endl;
+        return -1;
     }
+
+    void parse_args(int argc, char *argv[]) {
+        conf_prefix = argv[1];
+
+        return;
+    }
+
+    void parse_config(Network& net, string prefix) {
+        ifstream topofile(prefix + ".topo");
+        string line;
+        map<string, Node> nodes;
+
+        for (int linenumber = 1; getline(topofile, line); linenumber++) {
+            string src_name, dst_name;
+            vector<double> coefs;
+            double capacity = 0, coef;
+            istringstream lis(line);
+
+            if (line.length() > 0 && line[0] == '#')
+                continue;
+
+            lis >> src_name >> dst_name;
+
+            if (src_name.length() == 0 || dst_name.length() == 0) {
+                cerr << "Falformed input on line " << linenumber << ": " << line << endl;
+            }
+
+            lis >> capacity;
+
+            while (lis >> coef) {
+                coefs.push_back(coef);
+            }
+
+            if (nodes.find(src_name) == nodes.end()) {
+                nodes.insert(make_pair(src_name, Node(src_name)));
+            }
+            if (nodes.find(dst_name) == nodes.end()) {
+                nodes.insert(make_pair(dst_name, Node(dst_name)));
+            }
+
+            net.add(nodes.find(src_name)->second);
+            net.add(nodes.find(dst_name)->second);
+            net.add(Link(nodes.find(src_name)->second, nodes.find(dst_name)->second, coefs, capacity));
+        }
+    }
+
+    string extract_nodename_from_spec(std::string& node_spec) {
+        istringstream is(node_spec);
+        string name;
+
+        is >> name;
+
+        getline(is, node_spec);
+
+        return name;
+    }
+
+    void vary_traffic(Network& topo, char order, string& spec) throw (exception) {
+        string origName = extract_nodename_from_spec(spec);
+        string dstName = extract_nodename_from_spec(spec);
+
+        const Node& src = topo.getNode(origName);
+        const Node& dst = topo.getNode(dstName);
+
+        double lambda = atof(spec.c_str());
+
+        if (order == 'A')
+            topo.addTrafficToRoute(src, dst, lambda);
+        else if (order == 'R')
+            topo.removeTrafficFromRoute(src, dst, lambda);
+        else
+            cerr << "Incorrect line: " << order << ' ' << spec << endl;
+    }
+
+    void dump_info(Network& net, string& spec) {
+        string origName = extract_nodename_from_spec(spec);
+        string dstName = extract_nodename_from_spec(spec);
+
+        double cost;
+        Route route;
+
+        if (origName != "" && dstName != "") {
+            const Node& src = net.getNode(origName);
+            const Node& dst = net.getNode(dstName);
+            const Network::RouteInfo& r = net.getRoute(src, dst);
+
+            route = r.first;
+            cost = r.second;
+        } else {
+            cost = net.getTotalCost();
+        }
+
+        if (route.empty()) {
+            cout << "C: " << cost << " @" << net.getTotalTraffic()
+                    << " (" << cost << ')' << endl;
+        } else {
+            cout << "C: " << route
+                    << " (" << cost << ')' << endl;
+        }
+    }
+
+    void send_army(Network& net, const string& spec) {
+        int militia;
+        int verbosity;
+        istringstream is(spec);
+        set<pair<Node, Node> > routes = net.copyRoutes();
+
+        is >> militia >> verbosity;
+
+        for (int i = 0; i < militia; i++) {
+            for (const pair<Node, Node>& np : routes) {
+                bool alert = false;
+                Network::RouteInfo rinfo = net.sendAnt(np.first, np.second, &alert);
+                if (verbosity && alert) {
+                    cout << "T (it=" << i << ") " << rinfo.first << " (" << rinfo.second << ')' << endl;
+                }
+            }
+        }
+    }
+
+    void run_simulation(Network& net, const string& prefix) {
+        ifstream runfile(prefix + ".traffic");
+        string line;
+        int line_number = 0;
+
+        try {
+            while (getline(runfile, line)) {
+                string working_line = line.substr(1);
+                char order = line[0];
+                line_number += 1;
+
+                switch (line[0]) {
+                    case '#': continue;
+                    case 'A':
+                    case 'R':
+                        vary_traffic(net, order, working_line);
+                        break;
+                    case 'C':
+                        dump_info(net, working_line);
+                        break;
+                    case 'T':
+                        send_army(net, working_line);                        
+                        break;
+                    case 'S':
+                        Simulation::setRandomSeed(atoi(working_line.c_str()));
+                        break;
+                    default:
+                        cerr << "Malformed line: " << line << endl;
+                        return;
+                }
+            }
+        } catch (...) {
+            cerr << "Error while simulation at line " << line_number << ": " << line << endl;
+        }
+    }
+}
+
+/*
+ * 
+ */
+int main(int argc, char** argv) {
+    if (argc < 2) {
+        return usage(argc, argv);
+    }
+
+    parse_args(argc, argv);
+
+    Network net;
+
+    parse_config(net, conf_prefix);
+    run_simulation(net, conf_prefix);
 
     return 0;
 }
-
