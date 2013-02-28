@@ -74,6 +74,8 @@ public:
     RouteInfo addTrafficToRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);        
     RouteInfo removeTrafficFromRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);
     
+    std::set<std::pair<Node, Node> > copyRoutes() const noexcept;
+    
     double getTotalCost() const noexcept;
     double getTotalTraffic() const noexcept;
 private:
