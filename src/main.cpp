@@ -55,19 +55,43 @@ int main(int argc, char **argv) {
         net.add(Link(d, f,{0, 0, 1}));
 
         cout << net.addTraffic(a, e, 10) << endl;
-        cout << net.addTraffic(a, f, 10) << endl;
 
         for (int i = 1; i <= 500; i++) {
-            cout << i << ": " << net.sendAnt(a, e) << endl;
-            cout << i << ": " << net.sendAnt(a, f) << endl;
-        }        
-
+            cout << i << ": " << net.sendAnt(a, e) << endl;        
+        }
+        cout << net.addTraffic(a, f, 10) << endl;
         for (int i = 501; i <= 1000; i++) {
             cout << i << ": " << net.sendAnt(a, e) << endl;
             cout << i << ": " << net.sendAnt(a, f) << endl;
         }
         
-        cout << endl <<  "Summary:" << endl;
+        cout << net.addTraffic(a, b, 1) << endl;
+        for (int i = 1001; i <= 1250; i++) {
+            cout << i << ": " << net.sendAnt(a, e) << endl;
+            cout << i << ": " << net.sendAnt(a, f) << endl;
+        }
+        cout << net.addTrafficToRoute(a, b, 1) << endl;
+        for (int i = 1251; i <= 1350; i++) {
+            cout << i << ": " << net.sendAnt(a, e) << endl;
+            cout << i << ": " << net.sendAnt(a, f) << endl;
+        }
+        cout << net.addTrafficToRoute(a, b, 1) << endl;
+        for (int i = 1351; i <= 1450; i++) {
+            cout << i << ": " << net.sendAnt(a, e) << endl;
+            cout << i << ": " << net.sendAnt(a, f) << endl;
+        }
+        cout << net.addTrafficToRoute(a, b, 1) << endl;
+        for (int i = 1451; i <= 1550; i++) {
+            cout << i << ": " << net.sendAnt(a, e) << endl;
+            cout << i << ": " << net.sendAnt(a, f) << endl;
+        }
+        cout << net.addTrafficToRoute(a, b, 1) << endl;
+        for (int i = 1551; i <= 1650; i++) {
+            cout << i << ": " << net.sendAnt(a, e) << endl;
+            cout << i << ": " << net.sendAnt(a, f) << endl;
+        }
+
+        cout << endl << "Summary:" << endl;
         cout << net.getRoute(a, e) << endl;
         cout << net.getRoute(a, f) << endl;
         cout << "Total cost: " << net.getTotalCost() << endl;
