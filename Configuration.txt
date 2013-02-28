@@ -1,0 +1,41 @@
+# Configuration
+The configuration is stores in plain text files. Lines starting with # are
+simply discarded.
+
+The are three configuration files:
+
+* <prefix>.topo: Stores the configuration
+* <prefix>.traffic: Holds the time-dependant traffic matrix
+
+# Topology file
+Each line in this file represents a link between two nodes. Node names are
+arbitrary text strings and are dinamycally declared. In each line, both nodes
+must be separated by an arbitrary name of blank characters.
+
+Then, each line can has a parameter for describing the maximum desired rate
+carried by the link (0 for no limit) and finally a vector describing the power
+characteristics of each link, according to the formula:
+P(lambda) = a_0 * log(lambda) + b + sum_i=1^n a_i P(lambda)
+
+# Traffic file
+Each line contains an order with the following format.
+[ Traffic_variation | Information display | Seed initialization | Ant]
+
+where
+
+Traffic_variation := [A|R] node_orig node_dst traffic
+
+and A means "add traffic /traffic/ between node_orig and node_dst" and
+R means "remove traffic /traffic/ between node_orig and node_dst".
+
+Information display := C [node_orig node_dst]
+
+shows the current cost of the whole network (default) or, alternatively, the
+path between node_orig and node_dst.
+
+Seed initialization := S seed
+
+Ant := A number [v]
+
+and v is the verbosity level, that caused the simulator to signal changes in the routes.
+
