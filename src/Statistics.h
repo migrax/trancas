@@ -80,6 +80,7 @@ public:
         double rp = getRPrime();
         const double dOm = Deviation() / Mean();
         std::function<double (void) > f;
+        double rmin = 0.0, rmax = 1.0;
 
         if (dOm < epsilon) {
             f = std::bind(&Statistics::S, this);
@@ -89,11 +90,13 @@ public:
 
         if (rp < threshold) {
             rp += f();
+            rmax = 0.5;
         } else {
             rp -= f();
+            rmin = 0.5;
         }
                 
-        rp = bound(rp, 0., 1.);
+        rp = bound(rp, rmin, rmax);
         
         return pow(rp, h);
     }
