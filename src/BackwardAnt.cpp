@@ -40,7 +40,14 @@ void BackwardAnt::prepareRoute() throw (AntException) {
         prepared = true;
     }
     
-    assert(route.getDst() == newRoute.back());
+    if(route.getDst() != newRoute.back()) {
+        /* This happens when the last jump changes but the ant came
+         * from the old route.
+         * Just return the old route... it will eventually change when the ant
+         * goes thru the new "good" route.
+         */
+        newRoute = route;
+    }
 }
 
 Route BackwardAnt::getRoute() throw (AntException) {
@@ -51,29 +58,22 @@ Route BackwardAnt::getRoute() throw (AntException) {
 
 Node BackwardAnt::advance() throw(AntException) {    
     linkInfo& lc = linkCosts.top();
-    Node& current = lc.first;    
+    Node current = lc.first;    
     routeCost += lc.second;
         
     // Update probabilities and get current nexto hop for route /route/
     if (!reversedNodes.empty()) {
         const Node& prevNode = reversedNodes.back().first;
         
-        current.updateStats(route, routeCost);
+        current.updateStats(route, routeCost);        
         newRoute.push_back(current.calcNextHop(route, prevNode));
     }
     
     // Store the info about the current node for the next one
-    reversedNodes.push_back(move(lc));
-    /* Algorithm:
-     * a) Drop prev. node from stack and add it to a vector of visited nodes
-     * b) Update trip cost from current node to route destination
-     * c) Update probabilities
-     * d) Modify routes?. Save if to tell the source
-     * e) At the src, update the route
-     */   
+    reversedNodes.push_back(move(lc));   
     
     linkCosts.pop();
     
-    // Go to parent node
-    return lc.first;
+    // Return current node    
+    return current;
 }
