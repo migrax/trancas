@@ -194,8 +194,9 @@ namespace {
                         return;
                 }
             }
-        } catch (...) {
-            cerr << "Error while simulation at line " << line_number << ": " << line << endl;
+        } catch (const exception& e) {
+            cerr << "Error while simulation at line " << line_number << ": " << line << endl
+                    << e.what() << endl;
         }
     }
 }
