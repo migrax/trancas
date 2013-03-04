@@ -40,6 +40,17 @@ void BackwardAnt::prepareRoute() throw (AntException) {
         prepared = true;
     }
     
+    /* Sometime the route contains the destination node twice. This happens
+     * when the forward ant followed a longer way than the current route, and the
+     * backward ant records the optimal route, that reaches sooner to the destination.
+     * Prune the superflous part.
+     */
+    newRoute.erase(find(newRoute.begin() + 1, newRoute.end() - 1, newRoute.back()) + 1, newRoute.end());
+    /*
+     * We now it is not the first element (orig != dst) (Micro optimization)
+     * And we don't care if we do not find it, 'cause the erase from ele+1 onwards (Correcteness)
+     */
+    
     if(route.getDst() != newRoute.back()) {
         /* This happens when the last jump changes but the ant came
          * from the old route.
