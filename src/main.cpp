@@ -170,10 +170,14 @@ namespace {
 
         try {
             while (getline(runfile, line)) {
-                string working_line = line.substr(1);
+                string working_line;                
                 char order = line[0];
                 line_number += 1;
 
+                if (line.size() > 1) {
+                    working_line = line.substr(1);
+                }
+                
                 switch (line[0]) {
                     case '#': continue;
                     case 'A':
