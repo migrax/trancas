@@ -128,7 +128,7 @@ Network::RouteInfo Network::sendAnt(Node orig, const Node& dst, bool *changed) t
     return rInfo;
 }
 
-Network::RouteInfo Network::updateRoute(Route& newRoute) noexcept {
+Network::RouteInfo Network::updateRoute(Route& newRoute) throw(NetworkException) {
     std::pair<const Node&, const Node&> np(newRoute.front(), newRoute.back());
     auto ori = routes.find(np);
     assert(ori != routes.end());

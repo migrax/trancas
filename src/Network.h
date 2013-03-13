@@ -84,7 +84,7 @@ private:
     std::map<std::string, std::set<Node> > nodeEdges;
     std::map<std::pair<std::string, std::string>, RouteInfo> routes;
     
-    RouteInfo updateRoute(Route& newRoute) noexcept;
+    RouteInfo updateRoute(Route& newRoute) throw(NetworkException);
     RouteInfo changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);
 };
 
