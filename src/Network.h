@@ -86,6 +86,7 @@ private:
     
     RouteInfo updateRoute(Route& newRoute) throw(NetworkException);
     RouteInfo changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);
+    bool testRoute(const Route& r) const noexcept;
 };
 
 std::ostream& operator<<(std::ostream& os, const Network::RouteInfo& i);

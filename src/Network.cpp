@@ -119,10 +119,12 @@ Network::RouteInfo Network::sendAnt(Node orig, const Node& dst, bool *changed) t
     while (orig != barrancas.advance());
 
     Route newRoute = barrancas.getRoute();
-    if (newRoute != rInfo.first) { // Route has changed
-        rInfo = updateRoute(newRoute); // Route, cost
-        if (changed)
-            *changed = true;
+    if (testRoute(newRoute)) { // It is possible that the new route is still not connected...        
+        if (newRoute != rInfo.first) { // Route has changed
+            rInfo = updateRoute(newRoute); // Route, cost
+            if (changed)
+                *changed = true;
+        }
     }
 
     return rInfo;
@@ -243,12 +245,30 @@ double Network::getTotalTraffic() const noexcept {
 
 set<pair<Node, Node> > Network::copyRoutes() const noexcept {
     set<pair<Node, Node> > r;
-    
+
     for (const pair<pair<string, string>, RouteInfo> ri : routes) {
         r.insert(make_pair(ri.second.first.front(), ri.second.first.back()));
     }
-    
+
     return move(r);
+}
+
+/* 
+ * This function assures that a new backward ant's route is connected. As
+ * neighbours are selected independently by each node, the resulting route
+ * may not follow a connected path from src to orig.
+ * In that is the case, the route must be discarded in the hope that another
+ * and will soon follow the complete path.
+ */
+bool Network::testRoute(const Route& route) const noexcept {
+    bool ret = true;
+
+    for (auto ci = route.begin(); ci < route.end() - 1; ci++) {
+        if (links.find(make_pair(*ci, *(ci + 1))) == links.end())
+            return false;
+    }
+
+    return ret;
 }
 
 std::ostream& operator<<(std::ostream& os, const Network::RouteInfo& i) {
