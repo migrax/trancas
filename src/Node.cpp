@@ -131,6 +131,11 @@ Node Node::calcNextHop(const Route& r, const Node& prev) throw (NodeException) {
 
     for (Neighbour& n : status->neighbours) {
         double prob = n.getProb(np);
+        
+        if (prob < 0) {
+            // Route is ignored by the neighbours... Assing equal prob to both of them            
+            prob = 1.0/static_cast<double>(status->neighbours.size());
+        }
 
         if (n.getNode() == prev) {
             prob += (1 - rp) * (1 - prob);
