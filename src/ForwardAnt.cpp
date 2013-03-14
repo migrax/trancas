@@ -83,7 +83,8 @@ Node ForwardAnt::advance() throw (AntException) {
 
     // Force random if the chosen node has already been visited
     if (visitedNodes.find(next) != visitedNodes.end()) {        
-        next = chooseRandomNeighbour();
+        next = chooseNextNode();
+    }
     assert(currentNode != next);
 
     linkCosts.push(make_pair(next, getCost(currentNode, next)));
