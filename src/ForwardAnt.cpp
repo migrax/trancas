@@ -82,7 +82,7 @@ Node ForwardAnt::advance() throw (AntException) {
     assert(currentNode != next);
 
     // Force random if the chosen node has already been visited
-    if (visitedNodes.find(currentNode) != visitedNodes.end())
+    if (visitedNodes.find(next) != visitedNodes.end()) {        
         next = chooseRandomNeighbour();
     assert(currentNode != next);
 
