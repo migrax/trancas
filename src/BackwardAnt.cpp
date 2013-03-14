@@ -69,8 +69,7 @@ Route BackwardAnt::getRoute() throw (AntException) {
 
 Node BackwardAnt::advance() throw(AntException) {    
     linkInfo& lc = linkCosts.top();
-    Node current = lc.first;    
-    routeCost += lc.second;
+    Node current = lc.first;        
         
     // Update probabilities and get current nexto hop for route /route/
     if (!reversedNodes.empty()) {
@@ -79,6 +78,8 @@ Node BackwardAnt::advance() throw(AntException) {
         current.updateStats(route, routeCost);        
         newRoute.push_back(current.calcNextHop(route, prevNode));
     }
+    // Add cost from previous node to the current one to the total route cost
+    routeCost += lc.second;
     
     // Store the info about the current node for the next one
     reversedNodes.push_back(move(lc));   
