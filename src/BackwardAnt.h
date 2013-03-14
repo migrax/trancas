@@ -41,7 +41,7 @@ public:
         }
     }
 
-    Node advance() throw (AntException);
+    Node advance() throw (TrancasException);
     Route getRoute() throw (AntException);
 private:
     std::vector<linkInfo> reversedNodes = std::vector<linkInfo>();

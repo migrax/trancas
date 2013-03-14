@@ -120,7 +120,7 @@ void Node::updateStats(const Route& r, double cost) noexcept {
     status->trips[np].addSample(cost);
 }
 
-Node Node::calcNextHop(const Route& r, const Node& prev) noexcept {
+Node Node::calcNextHop(const Route& r, const Node& prev) throw (NodeException) {
     static const Node dummy("Dummy node in calcNextHop");
     const pair<const Node&, const Node&> np(r.front(), r.back());
     const double rp = status->trips[np].getCorrectedRPrime();

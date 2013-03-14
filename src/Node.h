@@ -70,7 +70,7 @@ public:
     const Node& getGoodNeighbour(const NodePair& routeEnds, const std::string& avoid = "") const noexcept;
     
     void updateStats(const Route& r, double cost) noexcept;
-    Node calcNextHop(const Route& r, const Node& prev) noexcept;
+    Node calcNextHop(const Route& r, const Node& prev) throw (NodeException);
     
     bool operator==(const Node& b) const noexcept {
         return id == b.id;

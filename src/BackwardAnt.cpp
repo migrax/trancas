@@ -67,7 +67,7 @@ Route BackwardAnt::getRoute() throw (AntException) {
     return newRoute;
 }
 
-Node BackwardAnt::advance() throw(AntException) {    
+Node BackwardAnt::advance() throw(TrancasException) {    
     linkInfo& lc = linkCosts.top();
     Node current = lc.first;        
         
