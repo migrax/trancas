@@ -23,6 +23,8 @@
 #include "Ant.h"
 #include "Simulation.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
 
 Node::Node(const std::string& name) noexcept :
@@ -162,7 +164,7 @@ double Node::Neighbour::getProb(const NodePair& routeEnds) const noexcept {
 
 double Node::Neighbour::setProb(const NodePair& routeEnds, double prob) throw (NodeException) {
     if (prob < 0.0 || prob > 1.0)
-        throw NodeException("Probability cannot be outside [0, 1] range.");
+        throw NodeException("Probability cannot be outside [0, 1] range: " + boost::lexical_cast<string>(prob));
 
     status->routeProbs[routeEnds] = prob;
 
