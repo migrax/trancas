@@ -29,28 +29,26 @@
 
 #include <utility>
 #include <vector>
+#include <map>
 
 class BackwardAnt : public Ant {
 public:
 
-    BackwardAnt(ForwardAnt&& ant) throw (AntException) : Ant(std::move(ant.route), ant.traffic) {
-        linkCosts = std::move(ant.linkCosts);
-
-        if (linkCosts.top().first != route.back()) {
-            throw AntException("Backward ants must start at the end of the route");
-        }
-    }
+    BackwardAnt(ForwardAnt&& ant) throw (AntException);
 
     Node advance() throw (TrancasException);
     Route getRoute() throw (AntException);
 private:
     std::vector<linkInfo> reversedNodes = std::vector<linkInfo>();
+    std::map<Node::NodePair, double> unvisitedLinks;
     Route newRoute;
     
     bool prepared = false;
     double routeCost = 0;
+    double extraCost;
 
     void prepareRoute() throw (AntException);
+    double calcExtraCost(const Node::NodePair& np) const throw (NetworkException);
 };
 
 #endif	/* BACKWARDANT_H */

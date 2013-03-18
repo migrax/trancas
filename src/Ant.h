@@ -30,6 +30,8 @@
 #include <stack>
 #include <utility>
 
+class Network;
+
 class AntException : public TrancasException {
 public:
     AntException(const std::string& reason) noexcept : TrancasException(reason) {}
@@ -40,15 +42,16 @@ class BackwardAnt;
 class Ant {
 public:
 
-    Ant(const Route& route, double traffic) noexcept : route(route), traffic(traffic) {
+    Ant(const Network& graph, const Route& route, double traffic) noexcept : graph(graph), route(route), traffic(traffic) {
     }
-    Ant(const Route&& route, double traffic) noexcept : route(std::move(route)), traffic(traffic) {
+    Ant(const Network& graph, const Route&& route, double traffic) noexcept : graph(graph), route(std::move(route)), traffic(traffic) {
     }
 
     virtual Node advance() throw(TrancasException) = 0;
     
     friend class BackwardAnt;
 protected:
+    const Network& graph;
     typedef std::pair<Node, double> linkInfo;
     
     Route route;    
