@@ -35,7 +35,7 @@ path between node_orig and node_dst.
 
 Seed initialization := S seed
 
-Ant := A number [v]
+Ant := T number [v]
 
 and v is the verbosity level, that caused the simulator to signal changes in the routes.
 
