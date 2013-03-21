@@ -23,10 +23,12 @@ Each line contains an order with the following format.
 
 where
 
-Traffic_variation := [A|R] node_orig node_dst traffic
+Traffic_variation := [a|A|R] node_orig node_dst traffic
 
-and A means "add traffic /traffic/ between node_orig and node_dst" and
-R means "remove traffic /traffic/ between node_orig and node_dst".
+and (a|A) means "add traffic /traffic/ between node_orig and node_dst" and
+R means "remove traffic /traffic/ between node_orig and node_dst". 'a' uses SPF
+to calculate the new route, whereas A tries to minimize the effects of the new
+traffic in the network cost.
 
 Information display := C [node_orig node_dst]
 

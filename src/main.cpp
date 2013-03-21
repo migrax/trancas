@@ -109,7 +109,9 @@ namespace {
 
         double lambda = atof(spec.c_str());
 
-        if (order == 'A')
+        if (order == 'a') // Can only add new routes for SPF mode
+            topo.addTraffic(src, dst, lambda, Network::SPF);
+        else if (order == 'A')
             topo.addTrafficToRoute(src, dst, lambda);
         else if (order == 'R')
             topo.removeTrafficFromRoute(src, dst, lambda);
@@ -170,16 +172,17 @@ namespace {
 
         try {
             while (getline(runfile, line)) {
-                string working_line;                
+                string working_line;
                 char order = line[0];
                 line_number += 1;
 
                 if (line.size() > 1) {
                     working_line = line.substr(1);
                 }
-                
+
                 switch (line[0]) {
                     case '#': continue;
+                    case 'a': 
                     case 'A':
                     case 'R':
                         vary_traffic(net, order, working_line);
@@ -188,7 +191,7 @@ namespace {
                         dump_info(net, working_line);
                         break;
                     case 'T':
-                        send_army(net, working_line);                        
+                        send_army(net, working_line);
                         break;
                     case 'S':
                         Simulation::setRandomSeed(atoi(working_line.c_str()));

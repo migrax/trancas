@@ -29,7 +29,7 @@
 using namespace std;
 
 Dijkstra::Dijkstra(const Node& src, const Node& dst,
-        const Network& graph, double lambda) throw(TrancasException) : ShortestPath(src, dst, graph, lambda) {
+        const Network& graph, double lambda, CostFunction costfunc) throw(TrancasException) : ShortestPath(src, dst, graph, lambda), costFunc(costfunc) {
     set<Node> reachable;
 
     Node last_added = src;
@@ -68,7 +68,18 @@ void Dijkstra::updateDistances(Dijkstra::distances_map *distances,
         const Node::NodePair np(newest, n);
         const Link l = graph.getLink(np);        
 
-        double cost = l.getCost(lambda);        
+        double cost;
+        switch(costFunc) {
+            case Real:
+                cost = l.getCost(lambda);
+                break;
+            case Constant:
+                cost = 1.0;
+                break;
+            default:
+                throw SPFException("Unhandled cost function");
+        }
+        
         const Distance<double> distance = cost + distance2Newest;        
 
         if (distances->find(n) == distances->end()) {                

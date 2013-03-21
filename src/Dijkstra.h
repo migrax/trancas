@@ -40,12 +40,15 @@ class Network;
 
 class Dijkstra : public ShortestPath {
 public:
+    enum CostFunction {Real, Constant};
+    
     Dijkstra(const Node& src, const Node& dst,
-            const Network& graph, double lambda) throw(TrancasException);
+            const Network& graph, double lambda, CostFunction cost = Real) throw(TrancasException);
 
 
 private:    
     typedef std::map<std::string, std::pair<Distance<double>, Node::NodePair> > distances_map;
+    CostFunction costFunc;
     
     void updateDistances(distances_map *distances, Node newest) const;
     Node getNearestNode(const distances_map& distances, const std::set<Node>& reachable) const noexcept;

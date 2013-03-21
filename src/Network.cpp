@@ -82,14 +82,14 @@ Link Network::getLink(const Node::NodePair& np) const throw (NetworkException) {
     return *clink;
 }
 
-Network::RouteInfo Network::addTraffic(Node orig, const Node& dst, double traffic) throw (TrancasException) {
+Network::RouteInfo Network::addTraffic(Node orig, const Node& dst, double traffic, RouteMode mode) throw (TrancasException) {
     /* Algorithm:
      * a) Calculate route (link collection)
      * b) Update info at orig node
      * c) Update link traffic
      * d) Update Nodes neighbour traffic
      */
-    Dijkstra spf(orig, dst, *this, traffic);
+    Dijkstra spf(orig, dst, *this, traffic, mode==SPF ? Dijkstra::Constant : Dijkstra::Real);
 
     Route r = spf.getRoute();
     double cost = 0.0;
