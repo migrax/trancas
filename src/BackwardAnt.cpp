@@ -80,7 +80,7 @@ void BackwardAnt::prepareRoute() throw (AntException) {
      */
     newRoute.erase(find(newRoute.begin() + 1, newRoute.end() - 1, newRoute.back()) + 1, newRoute.end());
     /*
-     * We now it is not the first element (orig != dst) (Micro optimization)
+     * We know it is not the first element (orig != dst) (Micro optimization)
      * And we don't care if we do not find it, 'cause the erase from ele+1 onwards (Correcteness)
      */
 
@@ -104,7 +104,7 @@ Node BackwardAnt::advance() throw (TrancasException) {
     linkInfo& lc = linkCosts.top();
     Node current = lc.first;
 
-    // Update probabilities and get current nexto hop for route /route/
+    // Update probabilities and get current next hop for route /route/
     if (!reversedNodes.empty()) {
         const Node& prevNode = reversedNodes.back().first;
         map<Node::NodePair, double>::iterator ui;
