@@ -105,7 +105,7 @@ namespace {
         string dstName = extract_nodename_from_spec(spec);
 
         const Node& src = topo.getNode(origName);
-        const Node& dst = topo.getNode(dstName);
+        const Node& dst = topo.getNode(dstName);        
 
         double lambda = atof(spec.c_str());
 
@@ -143,6 +143,32 @@ namespace {
         } else {
             cout << "C: " << route
                     << " (" << cost << ')' << endl;
+        }
+    }
+    
+    void show_length(Network& net, string& spec) {
+        string origName = extract_nodename_from_spec(spec);
+        string dstName = extract_nodename_from_spec(spec);
+
+        double length;
+        Route route;
+
+        if (origName != "" && dstName != "") {
+            const Node& src = net.getNode(origName);
+            const Node& dst = net.getNode(dstName);
+            const Network::RouteInfo& r = net.getRoute(src, dst);
+
+            route = r.first;
+            length = r.first.size();
+        } else {
+            length = net.getAvLength();
+        }
+
+        if (route.empty()) {
+            cout << "L: " << length << " @" << net.getTotalTraffic() << endl;
+        } else {
+            cout << "L: " << route
+                    << " (" << length << ')' << endl;
         }
     }
 
@@ -195,6 +221,9 @@ namespace {
                         break;
                     case 'S':
                         Simulation::setRandomSeed(atoi(working_line.c_str()));
+                        break;
+                    case 'L':
+                        show_length(net, working_line);
                         break;
                     default:
                         cerr << "Malformed line: " << line << endl;

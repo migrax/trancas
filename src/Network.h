@@ -79,6 +79,7 @@ public:
     
     double getTotalCost() const noexcept;
     double getTotalTraffic() const noexcept;
+    double getAvLength() const noexcept;
 private:
     std::map<std::string, Node> nodes;
     std::set<Link> links;
