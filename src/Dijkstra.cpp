@@ -96,7 +96,7 @@ void Dijkstra::updateDistances(Dijkstra::distances_map *distances,
 }
 
 Node Dijkstra::getNearestNode(const Dijkstra::distances_map& distances, const set<Node>& reachable) const noexcept {
-    static const Node dummy("dummy");
+    static const Node dummy("dummy at Dijkstra::getNearestNode");
     
     Node closest(dummy);
     Distance<double> distance = numeric_limits<double>::infinity();    
