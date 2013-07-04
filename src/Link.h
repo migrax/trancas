@@ -100,6 +100,10 @@ public:
     double getCurrentTraffic() const noexcept {
         return shared->current_traffic;
     }
+    
+    double getMaxTraffic() const noexcept {
+        return max_traffic;
+    }
 
     double getCurrentCost(double flow_traffic = 0.0) const noexcept;
 

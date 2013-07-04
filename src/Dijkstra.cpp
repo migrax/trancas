@@ -74,7 +74,11 @@ void Dijkstra::updateDistances(Dijkstra::distances_map *distances,
                 cost = l.getCost(lambda);
                 break;
             case Constant:
-                cost = 1.0;
+                if (l.getCurrentTraffic() + lambda < l.getMaxTraffic()) {
+                    cost = 1.0;
+                } else {
+                    cost = numeric_limits<double>::infinity();
+                }
                 break;
             default:
                 throw SPFException("Unhandled cost function");
