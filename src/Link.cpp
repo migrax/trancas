@@ -78,6 +78,10 @@ Link Link::getNewReversedLink(const Link &orig) noexcept {
 double Link::getCost(double lambda) const noexcept {
     double new_cost, current_cost;
 
+    if (lambda + shared->current_traffic > max_traffic) {
+        return numeric_limits<double>::infinity();
+    }
+    
     new_cost = getCostForTraffic(lambda + shared->current_traffic, shared->coefs);
     current_cost = getCurrentCost();
 
