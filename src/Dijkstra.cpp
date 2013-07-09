@@ -74,7 +74,7 @@ void Dijkstra::updateDistances(Dijkstra::distances_map *distances,
                 cost = l.getCost(lambda);
                 break;
             case Constant:
-                if (l.getCurrentTraffic() + lambda < l.getMaxTraffic()) {
+                if (l.getMaxTraffic() <= 0 || l.getCurrentTraffic() + lambda < l.getMaxTraffic()) {
                     cost = 1.0;
                 } else {
                     cost = numeric_limits<double>::infinity();
