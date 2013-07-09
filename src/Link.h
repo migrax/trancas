@@ -138,7 +138,7 @@ private:
 
         // Status
         double current_traffic = 0;
-        mutable double current_power = 0;
+        mutable double current_power = -1;
     };
 
     std::shared_ptr<_shared> shared;
