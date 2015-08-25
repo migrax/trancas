@@ -6,7 +6,7 @@ A simulator for a new Energy Aware routing algorithm based on Ant Colonization
 Overview
 --------
 
-This is the simulator for the routing algorithm described in the paper "An Ant Colonization Routing Algorithm to Reduce Network Energy Consumption".
+This is the simulator for the routing algorithm described in the paper ["An Ant Colonization Routing Algorithm to Reduce Network Energy Consumption"](http://dx.doi.org/10.1016/j.jnca.2015.08.011).
 
 Usage
 -----
