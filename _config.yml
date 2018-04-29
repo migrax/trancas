@@ -1,0 +1,8 @@
+title: Trancas
+description: A simulator for a new Energy Aware routing algorithm based on Ant Colonization
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-minimal
+
+gems:
+  - jekyll-mentions
