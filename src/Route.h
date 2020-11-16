@@ -77,14 +77,14 @@ public:
         return edges.find(edge) != edges.end();
     }
 
-    const Node& getNext() const throw (RouteException) {
+    const Node& getNext() const {
         if (isLast())
             throw RouteException("Cannot go past node " + std::string(getCurrent()));
 
         return (*this)[index + 1];
     }
 
-    const Node& goNext() throw (RouteException) {
+    const Node& goNext() {
         const Node& next = getNext();
 
         index += 1;
@@ -92,14 +92,14 @@ public:
         return next;
     }
 
-    const Node& getPrevious() const throw (RouteException) {
+    const Node& getPrevious() const {
         if (isFirst())
             throw RouteException("Cannot go before node" + std::string(getCurrent()));
 
         return (*this)[index - 1];
     }
 
-    const Node& goPrevious() throw (RouteException) {
+    const Node& goPrevious() {
         const Node& prev = getPrevious();
 
         index -= 1;

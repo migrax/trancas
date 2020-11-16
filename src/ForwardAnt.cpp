@@ -70,7 +70,7 @@ double ForwardAnt::getCost(const Node& left, const Node& right) const noexcept {
     return cost;
 }
 
-Node ForwardAnt::advance() throw (AntException) {    
+Node ForwardAnt::advance() {
     // If we are in an already visited node. Pop information about it from the stack
     if (visitedNodes.find(currentNode) != visitedNodes.end()) {
         pruneStack(currentNode);

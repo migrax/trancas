@@ -29,7 +29,7 @@
 using namespace std;
 
 Dijkstra::Dijkstra(const Node& src, const Node& dst,
-        const Network& graph, double lambda, CostFunction costfunc) throw(TrancasException) : ShortestPath(src, dst, graph, lambda), costFunc(costfunc) {
+        const Network& graph, double lambda, CostFunction costfunc) : ShortestPath(src, dst, graph, lambda), costFunc(costfunc) {
     set<Node> reachable;
 
     Node last_added = src;

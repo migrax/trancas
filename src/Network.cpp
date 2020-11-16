@@ -33,7 +33,7 @@ void Network::add(const Node& n) noexcept {
     nodes.insert(std::make_pair(n.getName(), n));
 }
 
-Node Network::getNode(const std::string& nodeName) const throw (NetworkException) {
+Node Network::getNode(const std::string& nodeName) const {
     auto cnode = nodes.find(nodeName);
 
     if (cnode == nodes.end())
@@ -54,7 +54,7 @@ void Network::add(const Link& l) noexcept {
     nodeEdges[l.getDst()].insert(l.getOrig());
 }
 
-void Network::addNewRoute(const Route& r, double traffic) throw (TrancasException) {
+void Network::addNewRoute(const Route& r, double traffic) {
     const Node& orig = r.front();
     const Node& dst = r.back();
     pair<string, string> np(orig, dst);
@@ -73,7 +73,7 @@ void Network::addNewRoute(const Route& r, double traffic) throw (TrancasExceptio
     }
 }
 
-Link Network::getLink(const Node::NodePair& np) const throw (NetworkException) {
+Link Network::getLink(const Node::NodePair& np) const {
     auto clink = links.find(np);
 
     if (clink == links.end())
@@ -82,7 +82,7 @@ Link Network::getLink(const Node::NodePair& np) const throw (NetworkException) {
     return *clink;
 }
 
-Network::RouteInfo Network::addTraffic(Node orig, const Node& dst, double traffic, RouteMode mode) throw (TrancasException) {
+Network::RouteInfo Network::addTraffic(Node orig, const Node& dst, double traffic, RouteMode mode) {
     /* Algorithm:
      * a) Calculate route (link collection)
      * b) Update info at orig node
@@ -105,7 +105,7 @@ Network::RouteInfo Network::addTraffic(Node orig, const Node& dst, double traffi
     return RouteInfo(move(r), cost);
 }
 
-Network::RouteInfo Network::sendAnt(Node orig, const Node& dst, bool *changed) throw (TrancasException) {
+Network::RouteInfo Network::sendAnt(Node orig, const Node& dst, bool *changed) {
     auto ci = routes.find(make_pair(orig, dst));
     if (ci == routes.end())
         throw RouteException("No such route from " + string(orig) + " to " + string(dst) + '.');
@@ -130,7 +130,7 @@ Network::RouteInfo Network::sendAnt(Node orig, const Node& dst, bool *changed) t
     return rInfo;
 }
 
-Network::RouteInfo Network::updateRoute(Route& newRoute) throw(NetworkException) {
+Network::RouteInfo Network::updateRoute(Route& newRoute) {
     std::pair<const Node&, const Node&> np(newRoute.front(), newRoute.back());
     auto ori = routes.find(np);
     assert(ori != routes.end());
@@ -162,7 +162,7 @@ Network::RouteInfo Network::updateRoute(Route& newRoute) throw(NetworkException)
     return RouteInfo(newRoute, cost);
 }
 
-Network::RouteInfo Network::getRoute(const Node& orig, const Node& dst) const throw (NetworkException) {
+Network::RouteInfo Network::getRoute(const Node& orig, const Node& dst) const {
     auto ci = routes.find(make_pair(orig, dst));
     if (ci == routes.end())
         throw RouteException("No such route from " + string(orig) + " to " + string(dst) + '.');
@@ -180,11 +180,11 @@ Network::RouteInfo Network::getRoute(const Node& orig, const Node& dst) const th
     return RouteInfo(route, cost);
 }
 
-Network::RouteInfo Network::getRoute(const Node::NodePair& np) const throw (NetworkException) {
+Network::RouteInfo Network::getRoute(const Node::NodePair& np) const {
     return getRoute(np.first, np.second);
 }
 
-Network::RouteInfo Network::addTrafficToRoute(const Node& orig, const Node& dst, double traffic) throw (NetworkException) {
+Network::RouteInfo Network::addTrafficToRoute(const Node& orig, const Node& dst, double traffic) {
     if (traffic < 0.0) {
         throw NetworkException("Can only add positive values of traffic to a route");
     }
@@ -192,7 +192,7 @@ Network::RouteInfo Network::addTrafficToRoute(const Node& orig, const Node& dst,
     return changeTrafficInRoute(orig, dst, traffic);
 }
 
-Network::RouteInfo Network::removeTrafficFromRoute(const Node& orig, const Node& dst, double traffic) throw (NetworkException) {
+Network::RouteInfo Network::removeTrafficFromRoute(const Node& orig, const Node& dst, double traffic) {
     if (traffic < 0.0) {
         throw NetworkException("Can only remove positive values of traffic from a route");
     }
@@ -200,7 +200,7 @@ Network::RouteInfo Network::removeTrafficFromRoute(const Node& orig, const Node&
     return changeTrafficInRoute(orig, dst, -traffic);
 }
 
-Network::RouteInfo Network::changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) throw (NetworkException) {
+Network::RouteInfo Network::changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) {
     auto ci = routes.find(make_pair(orig, dst));
     if (ci == routes.end())
         return addTraffic(orig, dst, traffic);

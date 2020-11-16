@@ -48,13 +48,13 @@ public:
 
     void add(const Node& n) noexcept;
     
-    Node getNode(const std::string& nodeName) const throw(NetworkException);
+    Node getNode(const std::string& nodeName) const;
     
     void add(const Link& l) noexcept;
     
-    Link getLink(const Node::NodePair& np) const throw(NetworkException);
+    Link getLink(const Node::NodePair& np) const;
     
-    const std::set<Node>& getNeighbours(const Node& orig) const throw(NetworkException) {
+    const std::set<Node>& getNeighbours(const Node& orig) const {
         auto ci = nodeEdges.find(orig);
         
         if (ci == nodeEdges.end()) {
@@ -64,17 +64,17 @@ public:
         return ci->second;
     }    
     
-    void addNewRoute(const Route& r, double traffic) throw (TrancasException);    
+    void addNewRoute(const Route& r, double traffic);    
     
-    RouteInfo addTraffic(Node orig, const Node& dst, double traffic, RouteMode mode = Optimal) throw(TrancasException);
-    RouteInfo sendAnt(Node orig, const Node& dst, bool *changed = nullptr) throw(TrancasException);
+    RouteInfo addTraffic(Node orig, const Node& dst, double traffic, RouteMode mode = Optimal);
+    RouteInfo sendAnt(Node orig, const Node& dst, bool *changed = nullptr);
 
-    RouteInfo getRoute(const Node& orig, const Node& dst) const throw(NetworkException);
-    RouteInfo getRoute(const Node::NodePair& np) const throw(NetworkException);
+    RouteInfo getRoute(const Node &orig, const Node &dst) const;
+    RouteInfo getRoute(const Node::NodePair &np) const;
 
-    RouteInfo addTrafficToRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);        
-    RouteInfo removeTrafficFromRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);
-    
+    RouteInfo addTrafficToRoute(const Node &orig, const Node &dst, double traffic);
+    RouteInfo removeTrafficFromRoute(const Node &orig, const Node &dst, double traffic);
+
     std::set<std::pair<Node, Node> > copyRoutes() const noexcept;
     
     double getTotalCost() const noexcept;
@@ -85,10 +85,10 @@ private:
     std::set<Link> links;
     std::map<std::string, std::set<Node> > nodeEdges;
     std::map<std::pair<std::string, std::string>, RouteInfo> routes;
-    
-    RouteInfo updateRoute(Route& newRoute) throw(NetworkException);
-    RouteInfo changeTrafficInRoute(const Node& orig, const Node& dst, double traffic) throw(NetworkException);
-    bool testRoute(const Route& r) const noexcept;
+
+    RouteInfo updateRoute(Route &newRoute);
+    RouteInfo changeTrafficInRoute(const Node &orig, const Node &dst, double traffic);
+    bool testRoute(const Route &r) const noexcept;
 };
 
 std::ostream& operator<<(std::ostream& os, const Network::RouteInfo& i);

@@ -41,9 +41,9 @@ class Network;
 class Dijkstra : public ShortestPath {
 public:
     enum CostFunction {Real, Constant};
-    
-    Dijkstra(const Node& src, const Node& dst,
-            const Network& graph, double lambda, CostFunction cost = Real) throw(TrancasException);
+
+    Dijkstra(const Node &src, const Node &dst,
+             const Network &graph, double lambda, CostFunction cost = Real);
 
 
 private:    

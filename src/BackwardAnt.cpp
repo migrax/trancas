@@ -27,7 +27,7 @@
 
 using namespace std;
 
-BackwardAnt::BackwardAnt(ForwardAnt&& ant) throw (AntException) : Ant(ant.graph, move(ant.route), ant.traffic) {
+BackwardAnt::BackwardAnt(ForwardAnt&& ant) : Ant(ant.graph, move(ant.route), ant.traffic) {
     linkCosts = move(ant.linkCosts);
 
     if (linkCosts.top().first != route.back()) {
@@ -44,7 +44,7 @@ BackwardAnt::BackwardAnt(ForwardAnt&& ant) throw (AntException) : Ant(ant.graph,
 }
 
 /* Get the cost the other flows suffer if we abandon this link */
-double BackwardAnt::calcExtraCost(const Node::NodePair& np) const throw (NetworkException) {
+double BackwardAnt::calcExtraCost(const Node::NodePair& np) const {
     Link l = graph.getLink(np);
     
     double curTraffic = l.getCurrentTraffic();
@@ -60,7 +60,7 @@ double BackwardAnt::calcExtraCost(const Node::NodePair& np) const throw (Network
     return max(0.0, newCostRest - curCostRest);
 }
 
-void BackwardAnt::prepareRoute() throw (AntException) {
+void BackwardAnt::prepareRoute() {
     if (!linkCosts.empty()) {
         throw AntException("Cannot give complete route until I reach " + string(route.getSrc()));
     }
@@ -94,13 +94,13 @@ void BackwardAnt::prepareRoute() throw (AntException) {
     }
 }
 
-Route BackwardAnt::getRoute() throw (AntException) {
+Route BackwardAnt::getRoute() {
     prepareRoute();
 
     return newRoute;
 }
 
-Node BackwardAnt::advance() throw (TrancasException) {
+Node BackwardAnt::advance() {
     linkInfo& lc = linkCosts.top();
     Node current = lc.first;
 

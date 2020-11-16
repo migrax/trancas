@@ -47,7 +47,7 @@ public:
     Ant(const Network& graph, const Route&& route, double traffic) noexcept : graph(graph), route(std::move(route)), traffic(traffic) {
     }
 
-    virtual Node advance() throw(TrancasException) = 0;
+    virtual Node advance() = 0;
     
     friend class BackwardAnt;
 protected:

@@ -101,7 +101,7 @@ namespace {
         return name;
     }
 
-    void vary_traffic(Network& topo, char order, string& spec) throw (exception) {
+    void vary_traffic(Network& topo, char order, string& spec) {
         string origName = extract_nodename_from_spec(spec);
         string dstName = extract_nodename_from_spec(spec);
 

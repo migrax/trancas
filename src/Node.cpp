@@ -49,7 +49,7 @@ void Node::add(const Node& neighbour) noexcept {
     }
 }
 
-double Node::addTraffic(const Node& neighbour, double traffic) throw (NodeException) {
+double Node::addTraffic(const Node& neighbour, double traffic) {
     auto i = status->neighboursIndex.find(neighbour);
 
     if (i == status->neighboursIndex.end()) {
@@ -59,7 +59,7 @@ double Node::addTraffic(const Node& neighbour, double traffic) throw (NodeExcept
     return status->neighbours[i->second].addTraffic(traffic);
 }
 
-double Node::removeTraffic(const Node& neighbour, double traffic) throw (NodeException) {
+double Node::removeTraffic(const Node& neighbour, double traffic) {
     auto i = status->neighboursIndex.find(neighbour);
 
     if (i == status->neighboursIndex.end()) {
@@ -122,7 +122,7 @@ void Node::updateStats(const Route& r, double cost) noexcept {
     status->trips[np].addSample(cost);
 }
 
-Node Node::calcNextHop(const Route& r, const Node& prev) throw (NodeException) {
+Node Node::calcNextHop(const Route& r, const Node& prev) {
     static const Node dummy("Dummy node in calcNextHop");
     const pair<const Node&, const Node&> np(r.front(), r.back());
     const double rp = status->trips[np].getCorrectedRPrime();
@@ -167,7 +167,7 @@ double Node::Neighbour::getProb(const NodePair& routeEnds) const noexcept {
     return ci->second;
 }
 
-double Node::Neighbour::setProb(const NodePair& routeEnds, double prob) throw (NodeException) {
+double Node::Neighbour::setProb(const NodePair& routeEnds, double prob) {
     if (prob < 0.0 || prob > 1.0)
         throw NodeException("Probability cannot be outside [0, 1] range: " + boost::lexical_cast<string>(prob));
 

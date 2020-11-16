@@ -38,8 +38,9 @@ public:
         linkCosts.push(std::make_pair(currentNode, 0));
     };
 
-    virtual Node advance() throw (AntException);
+    virtual Node advance();
     void dump() noexcept;
+
 private:
     // Internal state    
     std::set<Node> visitedNodes;

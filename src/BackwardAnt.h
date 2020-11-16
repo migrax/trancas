@@ -33,11 +33,11 @@
 
 class BackwardAnt : public Ant {
 public:
+    BackwardAnt(ForwardAnt &&ant);
 
-    BackwardAnt(ForwardAnt&& ant) throw (AntException);
+    Node advance();
+    Route getRoute();
 
-    Node advance() throw (TrancasException);
-    Route getRoute() throw (AntException);
 private:
     std::vector<linkInfo> reversedNodes = std::vector<linkInfo>();
     std::map<Node::NodePair, double> unvisitedLinks;
@@ -47,8 +47,8 @@ private:
     double routeCost = 0;
     double extraCost;
 
-    void prepareRoute() throw (AntException);
-    double calcExtraCost(const Node::NodePair& np) const throw (NetworkException);
+    void prepareRoute();
+    double calcExtraCost(const Node::NodePair &np) const;
 };
 
 #endif	/* BACKWARDANT_H */

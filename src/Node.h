@@ -61,8 +61,8 @@ public:
 
     void add(const Node& neighbour) noexcept;
 
-    double addTraffic(const Node& neighbour, double traffic) throw (NodeException);    
-    double removeTraffic(const Node& neighbour, double traffic) throw (NodeException);    
+    double addTraffic(const Node &neighbour, double traffic);
+    double removeTraffic(const Node &neighbour, double traffic);
 
     void cleanRoute(const NodePair& np) noexcept;
     
@@ -70,8 +70,8 @@ public:
     const Node& getGoodNeighbour(const NodePair& routeEnds, const std::string& avoid = "") const noexcept;
     
     void updateStats(const Route& r, double cost) noexcept;
-    Node calcNextHop(const Route& r, const Node& prev) throw (NodeException);
-    
+    Node calcNextHop(const Route &r, const Node &prev);
+
     bool operator==(const Node& b) const noexcept {
         return id == b.id;
     }
@@ -103,9 +103,9 @@ private:
             return status->currentTraffic;
         }
         double getProb(const NodePair& routeEnds) const noexcept;
-        double setProb(const NodePair& routeEnds, double prob) throw (NodeException);
-        
-        const std::string& getName() const noexcept { return node->getName(); }        
+        double setProb(const NodePair &routeEnds, double prob);
+
+        const std::string& getName() const noexcept { return node->getName(); }
         const Node& getNode() const noexcept { return *node; }
     private:
         std::shared_ptr<Node> node;
