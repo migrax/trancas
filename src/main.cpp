@@ -32,6 +32,7 @@
 #include <sstream>
 #include <map>
 #include <exception>
+#include <utility>
 
 using namespace std;
 
@@ -95,7 +96,7 @@ namespace {
 
         is >> name;
 
-        getline(is, node_spec);
+        std::getline(is, node_spec);
 
         return name;
     }
@@ -144,6 +145,17 @@ namespace {
             cout << "C: " << route
                     << " (" << cost << ')' << endl;
         }
+    }
+    
+    void show_load(const Network& net, string& spec) {
+        string srcLink = extract_nodename_from_spec(spec);
+        string dstLink = extract_nodename_from_spec(spec);
+        
+        const Node& src = net.getNode(srcLink);
+        const Node& dst = net.getNode(dstLink);
+        const Link& l = net.getLink(std::make_pair(src, dst));
+        
+        std::cout << "O: " << srcLink << " to " << dstLink << " = " << l.getCurrentTraffic() << std::endl;
     }
     
     void show_length(Network& net, string& spec) {
@@ -215,6 +227,9 @@ namespace {
                         break;
                     case 'C':
                         dump_info(net, working_line);
+                        break;
+                    case 'O':
+                        show_load(net, working_line);
                         break;
                     case 'T':
                         send_army(net, working_line);
