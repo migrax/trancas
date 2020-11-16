@@ -5,4 +5,5 @@ compiler:
   - gcc
 script:
   - ./autogen.sh && make
-
+install:
+  - sudo apt install libboost-dev
