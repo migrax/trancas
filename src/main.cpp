@@ -45,7 +45,7 @@ namespace {
         return -1;
     }
 
-    void parse_args(int argc, char *argv[]) {
+    void parse_args(int, char *argv[]) {
         conf_prefix = argv[1];
 
         return;
