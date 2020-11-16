@@ -236,7 +236,7 @@ double Network::getTotalCost() const noexcept {
 double Network::getAvLength() const noexcept {
     double length = 0.0;
     
-    for (const pair<pair<string, string>, RouteInfo>& route : routes) {
+    for (const pair<pair<string, string>, RouteInfo> route : routes) {
         length += route.second.first.size();
     }
     
