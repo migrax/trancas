@@ -260,7 +260,7 @@ set<pair<Node, Node> > Network::copyRoutes() const noexcept {
         r.insert(make_pair(ri.second.first.front(), ri.second.first.back()));
     }
 
-    return move(r);
+    return r;
 }
 
 /* 
