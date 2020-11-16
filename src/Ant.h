@@ -46,6 +46,7 @@ public:
     }
     Ant(const Network& graph, const Route&& route, double traffic) noexcept : graph(graph), route(std::move(route)), traffic(traffic) {
     }
+    virtual ~Ant() = default;
 
     virtual Node advance() = 0;
     
