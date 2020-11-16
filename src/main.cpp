@@ -37,7 +37,7 @@ using namespace std;
 namespace {
     string conf_prefix;
 
-    int usage(int argc, char** argv) {
+    int usage(int, char** argv) {
         cerr << "Usage: " << basename(argv[0]) << " prefix" << endl;
 
         return -1;
