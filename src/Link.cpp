@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #include "Link.h"
 #include "Node.h"
 

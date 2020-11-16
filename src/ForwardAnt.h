@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #ifndef FORWARDANT_H
 #define	FORWARDANT_H
 

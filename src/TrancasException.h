@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #ifndef TRANCASEXCEPTION_H
 #define	TRANCASEXCEPTION_H
 

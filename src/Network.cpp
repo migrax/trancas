@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #include "Network.h"
 #include "Route.h"
 #include "Dijkstra.h"

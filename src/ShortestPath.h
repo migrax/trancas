@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #ifndef SHORTESTPATH_H
 #define	SHORTESTPATH_H
 

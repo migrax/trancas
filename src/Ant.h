@@ -22,7 +22,6 @@
 #ifndef ANT_H
 #define	ANT_H
 
-#include "config.h"
 #include "Node.h"
 #include "Route.h"
 #include "TrancasException.h"

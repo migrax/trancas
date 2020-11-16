@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #ifndef ROUTE_H
 #define	ROUTE_H
 

@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #ifndef NETWORK_H
 #define	NETWORK_H
 

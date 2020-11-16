@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #ifndef NODE_H
 #define	NODE_H
 

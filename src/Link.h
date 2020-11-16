@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #ifndef LINK_H
 #define	LINK_H
 

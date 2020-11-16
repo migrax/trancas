@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #ifndef BACKWARDANT_H
 #define	BACKWARDANT_H
 

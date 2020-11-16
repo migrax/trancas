@@ -19,8 +19,6 @@
  *
  */
 
-#include "config.h"
-
 #include <random>
 #include <limits>
 
