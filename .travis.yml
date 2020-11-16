@@ -11,4 +11,6 @@ script:
 
 before_install:
   - sudo apt update
-  - sudo apt install libboost-dev meson
+  - sudo apt install libboost-dev python3-pip
+  - sudo pip3 install ninja
+  - sudo pip3 install meson
