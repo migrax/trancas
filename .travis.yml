@@ -1,0 +1,8 @@
+dist: bionic
+language: cpp
+compiler:
+  - clang
+  - gcc
+script:
+  - ./autogen.sh && make
+
