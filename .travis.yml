@@ -3,7 +3,12 @@ language: cpp
 compiler:
   - clang
   - gcc
-script:
-  - ./autogen.sh && make
-install:
-  - sudo apt update && sudo apt install libboost-dev
+script:  
+  - mkdir build
+  - meson build
+  - cd build
+  - ninja
+
+before_install:
+  - sudo apt update
+  - sudo apt install libboost-dev meson

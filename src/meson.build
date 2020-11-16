@@ -1,0 +1,2 @@
+main_source = files('main.cpp', 'Ant.cpp', 'BackwardAnt.cpp', 'Dijkstra.cpp', 'ForwardAnt.cpp', 'Link.cpp', 'Network.cpp', 'Node.cpp', 'Route.cpp', 'ShortestPath.cpp', 'Simulation.cpp', 'Statistics.cpp', 'TrancasException.cpp')
+project_sources += main_source
